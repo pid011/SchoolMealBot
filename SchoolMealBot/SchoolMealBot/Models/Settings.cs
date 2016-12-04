@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using SchoolMeal;
 
-namespace SchoolMealsBot.Models
+namespace SchoolMealBot.Models
 {
     [Serializable]
     public class Settings

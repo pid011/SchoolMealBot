@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace SchoolMealsBot
+namespace SchoolMealBot
 {
     public class ContextConstants
     {
-        public const string SchoolMealSettingKey = "schoolMeal";
+        public const string SchoolMealettingKey = "schoolMeal";
     }
 }

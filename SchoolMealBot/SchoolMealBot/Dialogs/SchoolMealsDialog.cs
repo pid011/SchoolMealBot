@@ -6,10 +6,10 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 
-namespace SchoolMealsBot.Dialogs
+namespace SchoolMealBot.Dialogs
 {
     [Serializable]
-    public class SchoolMealsDialog : IDialog<object>
+    public class SchoolMealDialog : IDialog<object>
     {
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)

@@ -5,10 +5,10 @@ using System.Web;
 using Microsoft.Bot.Builder.FormFlow;
 using SchoolMeal;
 
-namespace SchoolMealsBot
+namespace SchoolMealBot
 {
     [Serializable]
-    public class SchoolMealsQuery
+    public class SchoolMealQuery
     {
         [Describe("관할지역")]
         [Prompt("주인님이 현재 다니는 교육기관의 관할지역을 골라주세요!(글로 쓰셔도 돼요!) {||}")]

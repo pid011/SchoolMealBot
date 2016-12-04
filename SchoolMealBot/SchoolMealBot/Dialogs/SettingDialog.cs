@@ -6,10 +6,10 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.FormFlow;
 using SchoolMeal;
-using SchoolMealsBot.Models;
+using SchoolMealBot.Models;
 using Microsoft.Bot.Connector;
 
-namespace SchoolMealsBot.Dialogs
+namespace SchoolMealBot.Dialogs
 {
     [Serializable]
     public class SettingDialog : IDialog<object>
@@ -20,43 +20,43 @@ namespace SchoolMealsBot.Dialogs
             await context.PostAsync("급식봇 설정을 시작중이에요...");
             var settingFormDialog = FormDialog.FromForm(BuildSettingForm, FormOptions.PromptInStart);
 
-            context.Call(settingFormDialog, ResumeAfterSchoolMealsFormDialogAsync);
+            context.Call(settingFormDialog, ResumeAfterSchoolMealFormDialogAsync);
         }
 
-        private IForm<SchoolMealsQuery> BuildSettingForm()
+        private IForm<SchoolMealQuery> BuildSettingForm()
         {
-            OnCompletionAsyncDelegate<SchoolMealsQuery> processSchoolMealsSetting = async (context, state) =>
+            OnCompletionAsyncDelegate<SchoolMealQuery> processSchoolMealSetting = async (context, state) =>
             {
             };
 
-            return new FormBuilder<SchoolMealsQuery>()
+            return new FormBuilder<SchoolMealQuery>()
                 .Message("급식봇을 설정할게요. 주인님!")
-                .Field(nameof(SchoolMealsQuery.SchoolRegion))
-                .Field(nameof(SchoolMealsQuery.SchoolType))
-                .Field(nameof(SchoolMealsQuery.SchoolCode))
+                .Field(nameof(SchoolMealQuery.SchoolRegion))
+                .Field(nameof(SchoolMealQuery.SchoolType))
+                .Field(nameof(SchoolMealQuery.SchoolCode))
                 .Confirm(async state => 
                     {
                         return new PromptAttribute($"주인님이 설정한 교육기관의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. 맞나요? 맞으면 [yes], 아니면 [no]를 입력해주세요. (*´･∀･)");
                     })
                 .AddRemainingFields()
-                .OnCompletion(processSchoolMealsSetting)
+                .OnCompletion(processSchoolMealSetting)
                 .Build();
         }
 
-        private async Task ResumeAfterSchoolMealsFormDialogAsync(IDialogContext context, IAwaitable<SchoolMealsQuery> result)
+        private async Task ResumeAfterSchoolMealFormDialogAsync(IDialogContext context, IAwaitable<SchoolMealQuery> result)
         {
             try
             {
-                var schoolMealsQuery = await result;
+                var SchoolMealQuery = await result;
 
                 var settings = new Settings()
                 {
-                    SchoolRegion = (Regions) schoolMealsQuery.SchoolRegion,
-                    SchoolType = (SchoolType) schoolMealsQuery.SchoolType,
-                    SchoolCode = schoolMealsQuery.SchoolCode
+                    SchoolRegion = (Regions) SchoolMealQuery.SchoolRegion,
+                    SchoolType = (SchoolType) SchoolMealQuery.SchoolType,
+                    SchoolCode = SchoolMealQuery.SchoolCode
                 };
 
-                context.ConversationData.SetValue(ContextConstants.SchoolMealSettingKey, settings);
+                context.ConversationData.SetValue(ContextConstants.SchoolMealettingKey, settings);
             }
             catch (FormCanceledException ex)
             {

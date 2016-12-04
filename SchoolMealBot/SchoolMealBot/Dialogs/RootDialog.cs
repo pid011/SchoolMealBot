@@ -6,10 +6,10 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using SchoolMeal;
-using SchoolMealsBot.Models;
+using SchoolMealBot.Models;
 using System.Threading;
 
-namespace SchoolMealsBot.Dialogs
+namespace SchoolMealBot.Dialogs
 {
     [Serializable]
     public class RootDialog : IDialog<object>
@@ -24,14 +24,14 @@ namespace SchoolMealsBot.Dialogs
         {
             var message = await argument;
 
-            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolMealSettingKey, out Settings settings))
+            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolMealettingKey, out Settings settings))
             {
                 await context.PostAsync("안녕하세요! 처음뵈는 주인님!  ヾ(｡･ω･)ｼ");
                 context.Call(new SettingDialog(), ResumeAfterSettingDialogAsync);
             }
             else
             {
-                await context.Forward(new SchoolMealsDialog(), ResumeAfterSchoolMealsDialogAsync, message, CancellationToken.None);
+                await context.Forward(new SchoolMealDialog(), ResumeAfterSchoolMealDialogAsync, message, CancellationToken.None);
                 await context.PostAsync($"1: {settings.SchoolCode}, 2: {settings.SchoolRegion.ToString()}, 3: {settings.SchoolType}");
             }
         }
@@ -54,7 +54,7 @@ namespace SchoolMealsBot.Dialogs
             }
         }
 
-        private async Task ResumeAfterSchoolMealsDialogAsync(IDialogContext context, IAwaitable<object> result)
+        private async Task ResumeAfterSchoolMealDialogAsync(IDialogContext context, IAwaitable<object> result)
         {
             context.Wait(MessageReceivedAsync);
         }
