@@ -64,9 +64,9 @@ namespace SchoolMealBot
 
         public enum SchoolTypes
         {
-            초등학교 = 2,
-            중학교 = 3,
-            고등학교 = 4
+            초등학교 = 1,
+            중학교 = 2,
+            고등학교 = 3
         }
     }
 }
