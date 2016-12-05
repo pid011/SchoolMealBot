@@ -11,17 +11,17 @@ namespace SchoolMealBot
     public class SchoolMealQuery
     {
         [Describe("관할지역")]
-        [Prompt("주인님이 현재 다니는 교육기관의 관할지역을 골라주세요!(글로 쓰셔도 돼요!) {||}")]
+        [Prompt("주인님이 현재 다니는 학교의 관할지역을 골라주세요!(글로 쓰셔도 돼요!) {||}")]
         [Template(TemplateUsage.NotUnderstood, "「{0}」 👈 이런 단어는 위에 있는 목록에 없어요...")]
         public SchoolRegions SchoolRegion { get; set; }
 
-        [Describe("교육기관 종류")]
-        [Prompt("주인님이 현재 다니는 교육기관의 종류를 골라주세요!(글로 쓰셔도 돼요!) {||}")]
+        [Describe("학교 종류")]
+        [Prompt("주인님이 현재 다니는 학교의 종류를 골라주세요!(글로 쓰셔도 돼요!) {||}")]
         [Template(TemplateUsage.NotUnderstood, "「{0}」 👈 이 단어는 위에 있는 목록에 없어요...")]
         public SchoolTypes SchoolType { get; set; }
 
-        [Describe("교육기관 고유코드")]
-        [Prompt("주인님이 현재 다니는 교육기관의 고유코드를 써주세요!")]
+        [Describe("학교 고유코드")]
+        [Prompt("주인님이 현재 다니는 학교의 고유코드를 써주세요!")]
         public string SchoolCode { get; set; }
 
         public enum SchoolRegions
@@ -64,7 +64,6 @@ namespace SchoolMealBot
 
         public enum SchoolTypes
         {
-            병설유치원 = 1,
             초등학교 = 2,
             중학교 = 3,
             고등학교 = 4

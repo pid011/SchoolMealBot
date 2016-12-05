@@ -37,7 +37,7 @@ namespace SchoolMealBot.Dialogs
                 .Field(nameof(SchoolMealQuery.SchoolCode))
                 .Message(async state => 
                     {
-                        return new PromptAttribute($"주인님이 설정한 교육기관의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. (*´･∀･)");
+                        return new PromptAttribute($"주인님이 설정한 학교의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. (*´･∀･)");
                     })
                 .AddRemainingFields()
                 .OnCompletion(processSchoolMealSetting)
