@@ -17,7 +17,7 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            await context.PostAsync("급식봇 설정을 시작중이에요...");
+            await context.PostAsync("설정을 시작중이에요...");
             var settingFormDialog = FormDialog.FromForm(BuildSettingForm, FormOptions.PromptInStart);
 
             context.Call(settingFormDialog, ResumeAfterSchoolMealFormDialogAsync);
@@ -27,16 +27,17 @@ namespace SchoolMealBot.Dialogs
         {
             OnCompletionAsyncDelegate<SchoolMealQuery> processSchoolMealSetting = async (context, state) =>
             {
+                await context.PostAsync("설정을 끝냈어요. \\(●⁰౪⁰●\\)(//●⁰౪⁰●)//");
             };
 
             return new FormBuilder<SchoolMealQuery>()
-                .Message("급식봇을 설정할게요. 주인님!")
+                .Message("제가 하라는대로 해주시면 돼요!")
                 .Field(nameof(SchoolMealQuery.SchoolRegion))
                 .Field(nameof(SchoolMealQuery.SchoolType))
                 .Field(nameof(SchoolMealQuery.SchoolCode))
-                .Confirm(async state => 
+                .Message(async state => 
                     {
-                        return new PromptAttribute($"주인님이 설정한 교육기관의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. 맞나요? 맞으면 [yes], 아니면 [no]를 입력해주세요. (*´･∀･)");
+                        return new PromptAttribute($"주인님이 설정한 교육기관의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. (*´･∀･)");
                     })
                 .AddRemainingFields()
                 .OnCompletion(processSchoolMealSetting)
@@ -51,8 +52,8 @@ namespace SchoolMealBot.Dialogs
 
                 var settings = new Settings()
                 {
-                    SchoolRegion = (Regions) SchoolMealQuery.SchoolRegion,
-                    SchoolType = (SchoolType) SchoolMealQuery.SchoolType,
+                    SchoolRegion = (Regions)((int)SchoolMealQuery.SchoolRegion - 1),
+                    SchoolType = (SchoolType)((int)SchoolMealQuery.SchoolType - 1),
                     SchoolCode = SchoolMealQuery.SchoolCode
                 };
 
