@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.Bot.Builder.FormFlow;
-using SchoolMeal;
 
 namespace SchoolMealBot
 {
     [Serializable]
-    public class SchoolMealQuery
+    public class SchoolConfigQuery
     {
         [Describe("관할지역")]
         [Prompt("주인님이 현재 다니는 학교의 관할지역을 골라주세요!(글로 쓰셔도 돼요!) {||}")]

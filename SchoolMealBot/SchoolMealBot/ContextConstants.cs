@@ -7,6 +7,6 @@ namespace SchoolMealBot
 {
     public class ContextConstants
     {
-        public const string SchoolMealettingKey = "schoolMeal";
+        public const string SchoolConfigKey = "schoolConfig";
     }
 }
