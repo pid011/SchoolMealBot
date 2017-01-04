@@ -27,7 +27,7 @@ namespace SchoolMealBot.Dialogs
             if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo schoolInfo))
             {
                 await context.PostAsync("안녕하세요! 처음뵈는 주인님!  ヾ(｡･ω･)ｼ");
-                context.Call(new SetSchoolConfigDialog(), ResumeAfterSettingDialogAsync);
+                context.Call(new SchoolInfoSettingDialog(), ResumeAfterSchoolInfoSettingDialogAsync);
             }
             else
             {
@@ -36,12 +36,17 @@ namespace SchoolMealBot.Dialogs
             }
         }
 
-        private async Task ResumeAfterSettingDialogAsync(IDialogContext context, IAwaitable<object> result)
+        private async Task ResumeAfterSchoolInfoSettingDialogAsync(IDialogContext context, IAwaitable<SchoolInfo> input)
         {
             try
             {
-                var message = await result;
-                await context.PostAsync("설정작업이 끝났어요. 다시 말걸어주세요.");
+                var result = await input;
+                if (result != null)
+                {
+                    context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, result);
+                    await context.PostAsync("설정작업이 끝났어요. 다시 말걸어주세요.");
+                }
+
             }
             catch (Exception ex)
             {

@@ -77,11 +77,10 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SchoolFinder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SchoolFinder.1.0.7\lib\net46\SchoolFinder.dll</HintPath>
+      <HintPath>..\packages\SchoolFinder.1.0.12\lib\net46\SchoolFinder.dll</HintPath>
     </Reference>
-    <Reference Include="SchoolMeal, Version=1.0.6178.11826, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SchoolMealParser.0.0.28\lib\net46\SchoolMeal.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="SchoolMeal, Version=1.0.6208.23590, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SchoolMealParser.0.0.29\lib\net46\SchoolMeal.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.30826.1200, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -132,12 +131,13 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\SchoolMealDialog.cs" />
-    <Compile Include="Dialogs\SetSchoolConfigDialog.cs" />
+    <Compile Include="Dialogs\SchoolInfoSettingDialog.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchoolConfigQuery.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -149,9 +149,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

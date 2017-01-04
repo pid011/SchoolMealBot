@@ -1,85 +1,16 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using SchoolFinder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Threading.Tasks;
-using Microsoft.Bot.Builder.FormFlow;
-using SchoolFinder;
-using Microsoft.Bot.Connector;
 
-namespace SchoolMealBot.Dialogs
+namespace SchoolMealBot
 {
     [Serializable]
-    public class SetSchoolConfigDialog : IDialog<object>
+    internal class Util
     {
-#pragma warning disable CS1998
-        public async Task StartAsync(IDialogContext context)
-        {
-            await context.PostAsync("설정을 시작중이에요...");
-            var settingFormDialog = FormDialog.FromForm(BuildSetSchoolConfigForm, FormOptions.PromptInStart);
 
-            context.Call(settingFormDialog, ResumeAfterSchoolMealFormDialogAsync);
-        }
-
-        private IForm<SchoolConfigQuery> BuildSetSchoolConfigForm()
-        {
-            OnCompletionAsyncDelegate<SchoolConfigQuery> processSetSchoolConfig = async (context, state) =>
-            {
-                await context.PostAsync("설정을 끝냈어요. \\(●⁰౪⁰●\\)(//●⁰౪⁰●)//");
-            };
-
-            return new FormBuilder<SchoolConfigQuery>()
-                .Message("제가 하라는대로 해주시면 돼요!")
-                .Field(nameof(SchoolConfigQuery.SchoolRegion))
-                .Field(nameof(SchoolConfigQuery.SchoolType))
-                .Field(nameof(SchoolConfigQuery.SchoolCode))
-                .Message(async state => 
-                    {
-                        return new PromptAttribute($"주인님이 설정한 학교의 관할지역은 {state.SchoolRegion}이고 종류는 {state.SchoolType}, 고유코드는 {state.SchoolCode} 이에요. (*´･∀･)");
-                    })
-                .AddRemainingFields()
-                .OnCompletion(processSetSchoolConfig)
-                .Build();
-        }
-
-        private async Task ResumeAfterSchoolMealFormDialogAsync(IDialogContext context, IAwaitable<SchoolConfigQuery> result)
-        {
-            try
-            {
-                var schoolQuery = await result;
-
-                var settings = new SchoolInfo()
-                {
-                    Region = ConvertRegions(schoolQuery.SchoolRegion),
-                    SchoolType = ConvertSchoolTypes(schoolQuery.SchoolType),
-                    Code = schoolQuery.SchoolCode
-                };
-
-                context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, settings);
-            }
-            catch (FormCanceledException ex)
-            {
-                string reply;
-
-                if (ex.InnerException == null)
-                {
-                    reply = "설정 작업을 취소했어요. 설정작업을 나갈게요.";
-                }
-                else
-                {
-                    reply = $"이런! 문제가 발생했어요! :( \n원인: {ex.InnerException.Message}";
-                }
-
-                await context.PostAsync(reply);
-            }
-            finally
-            {
-                context.Done<object>(null);
-            }
-        }
-
-        private Regions ConvertRegions(SchoolConfigQuery.SchoolRegions region)
+        public static Regions ConvertRegions(SchoolConfigQuery.SchoolRegions region)
         {
             Regions result = Regions.Seoul;
             switch (region)
@@ -142,7 +73,7 @@ namespace SchoolMealBot.Dialogs
             return result;
         }
 
-        private SchoolTypes ConvertSchoolTypes(SchoolConfigQuery.SchoolTypes type)
+        public static SchoolTypes ConvertSchoolTypes(SchoolConfigQuery.SchoolTypes type)
         {
             SchoolTypes result = SchoolTypes.Elementary;
             switch (type)
