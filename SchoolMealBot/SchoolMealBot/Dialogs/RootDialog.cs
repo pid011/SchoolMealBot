@@ -14,53 +14,50 @@ namespace SchoolMealBot.Dialogs
     [Serializable]
     public class RootDialog : IDialog<object>
     {
+
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
             context.Wait(MessageReceivedAsync);
         }
 
-        public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            var message = await argument;
+            var message = await result;
 
-            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo schoolInfo))
+            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo))
             {
                 await context.PostAsync("안녕하세요! 처음뵈는 주인님!  ヾ(｡･ω･)ｼ");
-                context.Call(new SchoolInfoSettingDialog(), ResumeAfterSchoolInfoSettingDialogAsync);
+                await context.PostAsync("저장되어있는 학교정보가 없으니 설정을 시작할게요 (* ^ ω ^)");
+                context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
             }
             else
             {
-                await context.Forward(new SchoolMealDialog(), ResumeAfterSchoolMealDialogAsync, message, CancellationToken.None);
-                await context.PostAsync($"1: {schoolInfo.Code}, 2: {schoolInfo.Region.ToString()}, 3: {schoolInfo.SchoolType}");
-            }
-        }
-
-        private async Task ResumeAfterSchoolInfoSettingDialogAsync(IDialogContext context, IAwaitable<SchoolInfo> input)
-        {
-            try
-            {
-                var result = await input;
-                if (result != null)
-                {
-                    context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, result);
-                    await context.PostAsync("설정작업이 끝났어요. 다시 말걸어주세요.");
-                }
-
-            }
-            catch (Exception ex)
-            {
-                await context.PostAsync("알수없는 이유로 작업을 실패했어요...");
-                await context.PostAsync($"원인: {ex.Message}");
-            }
-            finally
-            {
+                await context.PostAsync($"1: {botInfo.Code}, 2: {botInfo.Region.ToString()}, 3: {botInfo.SchoolType}");
                 context.Wait(MessageReceivedAsync);
             }
+
         }
 
-        private async Task ResumeAfterSchoolMealDialogAsync(IDialogContext context, IAwaitable<object> result)
+        private async Task OnConfigSchoolInfoAsync(IDialogContext context, IAwaitable<SchoolInfo> result)
         {
+            var info = await result;
+            context.Call(new SearchSchoolDialog(info), OnSearchSchoolAsync);
+        }
+
+        private async Task OnSearchSchoolAsync(IDialogContext context, IAwaitable<SchoolInfo> result)
+        {
+            var info = await result;
+            if (info != null)
+            {
+                context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, info);
+                await context.PostAsync("설정을 완료했어요!");
+            }
+            else
+            {
+                await context.PostAsync("설정을 중단했어요! :<");
+            }
+
             context.Wait(MessageReceivedAsync);
         }
     }
