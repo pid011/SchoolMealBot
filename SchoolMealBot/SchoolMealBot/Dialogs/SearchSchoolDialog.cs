@@ -56,7 +56,7 @@ namespace SchoolMealBot.Dialogs
                     resultMsg.Attachments = new List<Attachment>();
                     foreach (var item in searchResults)
                     {
-                        HeroCard heroCard = new HeroCard()
+                        HeroCard heroCard = new HeroCard
                         {
                             Title = item.Name,
                             Text = item.Adress

@@ -31,7 +31,7 @@ namespace SchoolMealBot.Dialogs
             {
                 var query = await result;
 
-                this.userSchoolInfo = new SchoolInfo()
+                this.userSchoolInfo = new SchoolInfo
                 {
                     SchoolType = Util.ConvertSchoolTypes(query.SchoolType),
                     Region = Util.ConvertRegions(query.SchoolRegion)
