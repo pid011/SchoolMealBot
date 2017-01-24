@@ -24,25 +24,34 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            var mealMenu = await GetSchoolMealListAsync(context);
-
-            if (mealMenu != null)
+            try
             {
-                switch (this.resultType)
+                var mealMenu = await GetSchoolMealListAsync(context);
+
+                if (mealMenu != null)
                 {
-                    case ResultType.TodaysSchoolMeal:
-                        await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
-                        break;
-                    case ResultType.TomorrowsSchoolMeal:
-                        break;
-                    case ResultType.SchoolMealThisWeek:
-                        break;
-                    case ResultType.SchoolMealNextWeek:
-                        break;
-                    default:
-                        break;
+                    switch (this.resultType)
+                    {
+                        case ResultType.TodaysSchoolMeal:
+                            await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
+                            break;
+                        case ResultType.TomorrowsSchoolMeal:
+                            break;
+                        case ResultType.SchoolMealThisWeek:
+                            break;
+                        case ResultType.SchoolMealNextWeek:
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
+            catch (SchoolMeal.Exception.FaildToParseException ex)
+            {
+                await context.PostAsync($"급식메뉴를 가져오는중 오류가 발생했어요 :( {ex.InnerException.Message}");
+                context.Done<object>(null);
+            }
+            
         }
 
         private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
@@ -59,7 +68,7 @@ namespace SchoolMealBot.Dialogs
         {
             var tomorrowDate = DateTime.Today.AddDays(1);
             var menu = menus.Find(x => x.Date == tomorrowDate);
-            if (menu == null)
+            if (menu.IsExistMenu == false)
             {
                 await context.PostAsync("선택한 날짜에 해당하는 급식메뉴가 없네요.");
                 context.Done<object>(null);
@@ -74,6 +83,11 @@ namespace SchoolMealBot.Dialogs
         {
             var todayDate = DateTime.Today;
             var datesOfWeek = GetDatesOfWeek(todayDate);
+
+            foreach (var date in datesOfWeek)
+            {
+                // TODO: 메뉴리스트에서 일주일 날짜를 걸러내서 리스트에 따로 빼기
+            }
         }
 
         private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context)
