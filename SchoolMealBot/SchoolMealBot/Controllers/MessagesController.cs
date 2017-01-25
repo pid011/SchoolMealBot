@@ -26,6 +26,10 @@ namespace SchoolMealBot
             {
                 await Conversation.SendAsync(activity, () => new RootDialog());
             }
+            else if (activity.Type == ActivityTypes.ContactRelationUpdate)
+            {
+                await Conversation.SendAsync(activity, () => new RootDialog());
+            }
             else
             {
                 HandleSystemMessage(activity);

@@ -39,23 +39,22 @@ namespace SchoolMealBot.Dialogs
         {
             var message = await result;
 
+            await ShowOptionsAsync(context);
+        }
+
+        private async Task ShowOptionsAsync(IDialogContext context)
+        {
             if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo))
             {
-                await context.PostAsync("안녕하세요! ヾ(｡･ω･)ｼ");
-                await context.PostAsync("저장되어있는 학교정보가 없으니 설정이 필요해요 (* ^ ω ^)");
+                await context.PostAsync("먼저 지금 다니는 학교를 설정해야 해요.");
                 context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
             }
             else
             {
-                ShowOptions(context);
+                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, "무엇을 도와드릴까요?", "존재하지 않는 명령목록이에요.");
             }
-
         }
 
-        private void ShowOptions(IDialogContext context)
-        {
-            PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, "무엇을 도와드릴까요?", "존재하지 않는 명령목록이에요.");
-        }
 
         private async Task OnOptionSelectedAsync(IDialogContext context, IAwaitable<string> result)
         {
@@ -86,20 +85,19 @@ namespace SchoolMealBot.Dialogs
                         break;
 
                     default:
-                        context.Wait(MessageReceivedAsync);
                         break;
                 }
             }
             catch (TooManyAttemptsException)
             {
                 await context.PostAsync("시도횟수가 너무 많아요. 다시 한번 시도해주세요. :<");
-                context.Wait(MessageReceivedAsync);
+                await ShowOptionsAsync(context);
             }
         }
 
         private async Task AfterShowsSchoolMealListAsync(IDialogContext context, IAwaitable<object> result)
         {
-            context.Wait(MessageReceivedAsync);
+            await ShowOptionsAsync(context);
         }
 
         private async Task OnConfigSchoolInfoAsync(IDialogContext context, IAwaitable<SchoolInfo> result)
@@ -120,8 +118,7 @@ namespace SchoolMealBot.Dialogs
             {
                 await context.PostAsync("설정을 중단했어요!");
             }
-
-            context.Wait(MessageReceivedAsync);
+            await ShowOptionsAsync(context);
         }
     }
 }
