@@ -32,6 +32,7 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
+            await context.PostAsync("안녕하세요! 저는 급식메뉴를 알려주는 봇이에요!");
             context.Wait(MessageReceivedAsync);
         }
 
