@@ -35,12 +35,19 @@ namespace SchoolMealBot.Dialogs
                         case ResultType.TodaysSchoolMeal:
                             await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
                             break;
+
                         case ResultType.TomorrowsSchoolMeal:
+                            await ShowTomorrowsSchoolMealMenuAsync(context, mealMenu);
                             break;
+
                         case ResultType.SchoolMealThisWeek:
+                            await ShowSchoolMealThisWeekMenuAsync(context, mealMenu);
                             break;
+
                         case ResultType.SchoolMealNextWeek:
+                            await ShowSchoolMealNextWeekMenuAsync(context, mealMenu);
                             break;
+
                         default:
                             break;
                     }
@@ -67,27 +74,44 @@ namespace SchoolMealBot.Dialogs
         private async Task ShowTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var tomorrowDate = DateTime.Today.AddDays(1);
-            var menu = menus.Find(x => x.Date == tomorrowDate);
-            if (menu.IsExistMenu == false)
+            var tomorrowMenu = new List<MealMenu>();
+            if (menus.Exists(x => x.Date == tomorrowDate))
             {
-                await context.PostAsync("선택한 날짜에 해당하는 급식메뉴가 없네요.");
-                context.Done<object>(null);
+                tomorrowMenu.Add(menus.Find(x => x.Date == tomorrowDate));
             }
-            else
-            {
-                await ShowMessageAsync(context, new List<MealMenu>() { menu });
-            }
+            await ShowMessageAsync(context, tomorrowMenu);
         }
 
         private async Task ShowSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todayDate = DateTime.Today;
             var datesOfWeek = GetDatesOfWeek(todayDate);
+            var thisWeekMenu = new List<MealMenu>();
 
             foreach (var date in datesOfWeek)
             {
-                // TODO: 메뉴리스트에서 일주일 날짜를 걸러내서 리스트에 따로 빼기
+                if (menus.Exists(x => x.Date == date))
+                {
+                    thisWeekMenu.Add(menus.Find(x => x.Date == date));
+                }
             }
+            await ShowMessageAsync(context, thisWeekMenu);
+        }
+
+        private async Task ShowSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
+        {
+            var NextWeekDate = DateTime.Today.AddDays(7);
+            var datesOfWeek = GetDatesOfWeek(NextWeekDate);
+            var nextWeekMenu = new List<MealMenu>();
+
+            foreach (var date in datesOfWeek)
+            {
+                if (menus.Exists(x => x.Date == date))
+                {
+                    nextWeekMenu.Add(menus.Find(x => x.Date == date));
+                }
+            }
+            await ShowMessageAsync(context, nextWeekMenu);
         }
 
         private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context)
@@ -105,6 +129,13 @@ namespace SchoolMealBot.Dialogs
             return menus;
         }
 
+        /// <summary>
+        /// 매개변수로 받는 급식메뉴 리스트를 가공해서 메시지로 보낸 뒤 해당 Dialog를 끝냅니다.
+        /// 매개변수의 리스트가 비어있다면 리스트를 가공하지 않고 급식메뉴가 없다는 메시지를 보냅니다.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="menus">메시지로 보낼 급식메뉴</param>
+        /// <returns></returns>
         private async Task ShowMessageAsync(IDialogContext context, List<MealMenu> menus)
         {
             var resultMsg = context.MakeMessage();
@@ -153,7 +184,7 @@ namespace SchoolMealBot.Dialogs
 
             if (resultMsg.Attachments.Count == 0)
             {
-                await context.PostAsync("선택하신 날의 급식메뉴가 존재하지 않네요...");
+                await context.PostAsync("선택한 날짜에 해당하는 급식메뉴가 없네요.");
             }
             else
             {
