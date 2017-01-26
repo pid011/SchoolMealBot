@@ -114,12 +114,14 @@ namespace SchoolMealBot.Dialogs
             {
                 context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, info);
                 await context.PostAsync("설정을 완료했어요!");
+                await ShowOptionsAsync(context);
             }
             else
             {
                 await context.PostAsync("설정을 중단했어요!");
+                await context.PostAsync("저에게 다시 말을 걸어주세요!");
+                context.Wait(MessageReceivedAsync);
             }
-            await ShowOptionsAsync(context);
         }
     }
 }
