@@ -14,10 +14,17 @@ namespace SchoolMealBot.Dialogs
     public class SearchSchoolDialog : IDialog<SchoolInfo>
     {
         private SchoolInfo userSchoolInfo;
+        private SchoolInfo resultSchoolInfo;
 
         public SearchSchoolDialog(SchoolInfo info)
         {
             this.userSchoolInfo = info;
+        }
+
+        private enum YesNo
+        {
+            그래,
+            아니
         }
 
 #pragma warning disable CS1998
@@ -44,8 +51,7 @@ namespace SchoolMealBot.Dialogs
 
                 if (searchResults.Count == 1)
                 {
-                    // TODO: 학교정보 확인
-                    context.Done(searchResults.First());
+                    await CheckInfo(context, searchResults.First());
                 }
                 else if (searchResults.Count > 1)
                 {
@@ -77,8 +83,34 @@ namespace SchoolMealBot.Dialogs
                     context.Done<SchoolInfo>(null);
                 }
             }
+        }
 
-            
+        private async Task CheckInfo(IDialogContext context, SchoolInfo selectedInfo)
+        {
+            this.resultSchoolInfo = selectedInfo;
+
+            var checkMsg = context.MakeMessage();
+            checkMsg.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            checkMsg.Attachments.Add(new HeroCard(title: selectedInfo.Name, text: selectedInfo.Adress).ToAttachment());
+            await context.PostAsync(checkMsg);
+
+            var yesno = ((IEnumerable<YesNo>)Enum.GetValues(typeof(YesNo))).Select(x => x);
+            PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "이 학교정보로 설정할까요?", "정확하게 알려주세요!", promptStyle: PromptStyle.Keyboard);
+        }
+
+        private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<YesNo> result)
+        {
+            var choiced = await result;
+
+            if (choiced == YesNo.그래)
+            {
+                context.Done(this.resultSchoolInfo);
+            }
+            else
+            {
+                this.resultSchoolInfo = null;
+                PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 다시 알려주세요! ([ exit ] => 설정 종료)");
+            }
         }
     }
 }
