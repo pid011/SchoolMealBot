@@ -25,7 +25,7 @@ namespace SchoolMealBot.Dialogs
             var regions = ((IEnumerable<SchoolConfigQuery.SchoolRegions>)Enum.GetValues(typeof(SchoolConfigQuery.SchoolRegions))).Select(x => x);
 
             PromptDialog.Choice(context, OnSchoolRegionSelectedAsync, regions, 
-                "현재 다니는 학교의 관할지역을 골라주세요!", "다시 선택해주세요.", promptStyle: PromptStyle.Auto);
+                "현재 다니는 학교의 관할지역을 골라주세요!", "다시 선택해주세요.", promptStyle: PromptStyle.PerLine);
         }
 
         private async Task OnSchoolRegionSelectedAsync(IDialogContext context, IAwaitable<SchoolConfigQuery.SchoolRegions> result)

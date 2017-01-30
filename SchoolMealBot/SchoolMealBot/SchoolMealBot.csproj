@@ -54,11 +54,14 @@
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Bot.Builder, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bot.Builder.3.5.0\lib\net46\Microsoft.Bot.Builder.dll</HintPath>
+    <Reference Include="Microsoft.Bot.Builder, Version=3.5.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bot.Builder.3.5.1\lib\net46\Microsoft.Bot.Builder.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bot.Connector, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bot.Builder.3.5.0\lib\net46\Microsoft.Bot.Connector.dll</HintPath>
+    <Reference Include="Microsoft.Bot.Builder.Autofac, Version=3.5.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bot.Builder.3.5.1\lib\net46\Microsoft.Bot.Builder.Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bot.Connector, Version=3.5.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bot.Builder.3.5.1\lib\net46\Microsoft.Bot.Connector.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IdentityModel.Protocol.Extensions, Version=1.0.3.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -77,7 +80,7 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SchoolFinder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SchoolFinder.1.0.12\lib\net46\SchoolFinder.dll</HintPath>
+      <HintPath>..\packages\SchoolFinder.1.0.17\lib\net46\SchoolFinder.dll</HintPath>
     </Reference>
     <Reference Include="SchoolMeal, Version=1.0.6208.23590, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SchoolMealParser.0.0.29\lib\net46\SchoolMeal.dll</HintPath>

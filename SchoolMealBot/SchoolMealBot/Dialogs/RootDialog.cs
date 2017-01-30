@@ -51,7 +51,8 @@ namespace SchoolMealBot.Dialogs
             }
             else
             {
-                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!");
+                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, 
+                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Keyboard);
             }
         }
 

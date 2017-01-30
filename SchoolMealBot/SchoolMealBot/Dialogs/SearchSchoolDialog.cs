@@ -55,7 +55,7 @@ namespace SchoolMealBot.Dialogs
                 }
                 else if (searchResults.Count > 1)
                 {
-                    await context.PostAsync("여러개의 검색결과가 있어요! 정확하게 다시 알려주세요...");
+                    await context.PostAsync("여러개의 검색결과가 있어요! 정확하게 다시 알려주세요... (검색결과는 15개만 보여줍니다.)");
 
                     var resultMsg = context.MakeMessage();
                     resultMsg.AttachmentLayout = AttachmentLayoutTypes.Carousel;
