@@ -39,10 +39,10 @@ namespace SchoolMealBot.Dialogs
         {
             var message = await result;
 
-            await ShowOptionsAsync(context);
+            await ShowOptionsAsync(context, message.Text);
         }
 
-        private async Task ShowOptionsAsync(IDialogContext context)
+        private async Task ShowOptionsAsync(IDialogContext context, string msg = null)
         {
             if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo))
             {
@@ -51,7 +51,14 @@ namespace SchoolMealBot.Dialogs
             }
             else
             {
-                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, "무엇을 도와드릴까요?", "존재하지 않는 명령목록이에요.");
+                if (msg == "/start")
+                {
+                    await context.PostAsync("안녕하세요! 시작하려면 다시 말을 걸어주세요!");
+                }
+                else
+                {
+                    PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!");
+                }
             }
         }
 
