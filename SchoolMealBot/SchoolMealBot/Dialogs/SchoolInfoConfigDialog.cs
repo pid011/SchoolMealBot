@@ -63,7 +63,6 @@ namespace SchoolMealBot.Dialogs
         private IForm<SchoolConfigQuery> BuildSchoolInfoConfigForm()
         {
             return new FormBuilder<SchoolConfigQuery>()
-                .Message("제가 하라는대로 해주시면 돼요!")
                 .Field(nameof(SchoolConfigQuery.SchoolRegion))
                 .Field(nameof(SchoolConfigQuery.SchoolType))
                 .Build();

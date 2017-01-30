@@ -10,13 +10,13 @@ namespace SchoolMealBot
     public class SchoolConfigQuery
     {
         [Describe("관할지역")]
-        [Prompt("주인님이 현재 다니는 학교의 관할지역을 골라주세요!(글로 쓰셔도 돼요!) {||}")]
-        [Template(TemplateUsage.NotUnderstood, "「{0}」 👈 이런 단어는 위에 있는 목록에 없어요...")]
+        [Prompt("현재 다니는 학교의 관할지역을 골라주세요! {||}")]
+        [Template(TemplateUsage.NotUnderstood, "[ {0} ] 이런 단어는 위에 있는 목록에 없어요...")]
         public SchoolRegions SchoolRegion { get; set; }
 
         [Describe("학교종류")]
-        [Prompt("주인님이 현재 다니는 학교의 종류를 골라주세요!(글로 쓰셔도 돼요!) {||}")]
-        [Template(TemplateUsage.NotUnderstood, "「{0}」 👈 이 단어는 위에 있는 목록에 없어요...")]
+        [Prompt("현재 다니는 학교의 종류를 골라주세요! {||}")]
+        [Template(TemplateUsage.NotUnderstood, "[ {0} ] 이런 단어는 위에 있는 목록에 없어요...")]
         public SchoolTypes SchoolType { get; set; }
 
         public string SchoolCode { get; set; }
