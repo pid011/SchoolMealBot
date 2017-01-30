@@ -23,14 +23,14 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ /exit ] => 설정 종료)");
+            PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ exit ] => 설정 종료)");
         }
 
         private async Task OnGetSchoolNameAsync(IDialogContext context, IAwaitable<string> result)
         {
             var msg = await result;
 
-            if (msg == "/exit" || msg == null)
+            if (msg == "exit" || msg == null)
             {
                 await context.PostAsync("학교 검색을 나가는 중이에요!");
                 context.Done<SchoolInfo>(null);
