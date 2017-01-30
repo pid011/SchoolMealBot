@@ -70,12 +70,12 @@ namespace SchoolMealBot.Dialogs
                         resultMsg.Attachments.Add(heroCard.ToAttachment());
                     }
                     await context.PostAsync(resultMsg);
-                    PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ /exit ] => 설정 종료)");
+                    PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ exit ] => 설정 종료)");
                 }
                 else if (searchResults.Count < 1)
                 {
                     await context.PostAsync("검색결과가 존재하지 않네요... 다시한번 정확히 알려주세요!");
-                    PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ /exit ] => 설정 종료)");
+                    PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 알려주세요! ([ exit ] => 설정 종료)");
                 }
                 else
                 {
