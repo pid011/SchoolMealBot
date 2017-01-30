@@ -21,51 +21,30 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            var configFormDialog = FormDialog.FromForm(BuildSchoolInfoConfigForm, FormOptions.PromptInStart);
-            context.Call(configFormDialog, ResumeAfterSchoolInfoConfigFormAsync);
+            this.userSchoolInfo = new SchoolInfo();
+            var regions = ((IEnumerable<SchoolConfigQuery.SchoolRegions>)Enum.GetValues(typeof(SchoolConfigQuery.SchoolRegions))).Select(x => x);
+
+            PromptDialog.Choice(context, OnSchoolRegionSelectedAsync, regions, 
+                "현재 다니는 학교의 관할지역을 골라주세요!", "다시 선택해주세요.", promptStyle: PromptStyle.Auto);
         }
 
-        private async Task ResumeAfterSchoolInfoConfigFormAsync(IDialogContext context, IAwaitable<SchoolConfigQuery> result)
+        private async Task OnSchoolRegionSelectedAsync(IDialogContext context, IAwaitable<SchoolConfigQuery.SchoolRegions> result)
         {
-            try
-            {
-                var query = await result;
+            var choiced = await result;
+            this.userSchoolInfo.Region = Util.ConvertRegions(choiced);
 
-                this.userSchoolInfo = new SchoolInfo
-                {
-                    SchoolType = Util.ConvertSchoolTypes(query.SchoolType),
-                    Region = Util.ConvertRegions(query.SchoolRegion)
-                };
+            var types = ((IEnumerable<SchoolConfigQuery.SchoolTypes>)Enum.GetValues(typeof(SchoolConfigQuery.SchoolTypes))).Select(x => x);
 
-            }
-            catch (FormCanceledException ex)
-            {
-                string reply;
-
-                if (ex.InnerException == null)
-                {
-                    reply = "학교정보 설정을 취소했어요.";
-                }
-                else
-                {
-                    reply = $"이런! 오류가 발생했어요! :( {ex.InnerException.Message}";
-                }
-
-                this.userSchoolInfo = null;
-                await context.PostAsync(reply);
-            }
-            finally
-            {
-                context.Done(this.userSchoolInfo);
-            }
+            PromptDialog.Choice(context, OnSchoolTypeSelectedAsync, types,
+                "현재 다니는 학교의 종류를 골라주세요!", "다시 선택해주세요.", promptStyle: PromptStyle.Auto);
         }
 
-        private IForm<SchoolConfigQuery> BuildSchoolInfoConfigForm()
+        private async Task OnSchoolTypeSelectedAsync(IDialogContext context, IAwaitable<SchoolConfigQuery.SchoolTypes> result)
         {
-            return new FormBuilder<SchoolConfigQuery>()
-                .Field(nameof(SchoolConfigQuery.SchoolRegion))
-                .Field(nameof(SchoolConfigQuery.SchoolType))
-                .Build();
+            var choiced = await result;
+            this.userSchoolInfo.SchoolType = Util.ConvertSchoolTypes(choiced);
+
+            context.Done(this.userSchoolInfo);
         }
     }
 }
