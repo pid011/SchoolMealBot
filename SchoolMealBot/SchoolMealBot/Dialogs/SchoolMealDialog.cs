@@ -138,15 +138,41 @@ namespace SchoolMealBot.Dialogs
         /// <returns></returns>
         private async Task ShowMessageAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var resultMsg = context.MakeMessage();
-            resultMsg.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            resultMsg.Attachments = new List<Attachment>();
-
+            List<string> menu_list = new List<string>();
             foreach (var menu in menus)
             {
                 if (menu.IsExistMenu)
                 {
                     var resultMenu = new StringBuilder();
+                    resultMenu.Append($"{menu.Date.Month}월 {menu.Date.Day}일 ");
+                    switch (menu.Date.DayOfWeek)
+                    {
+                        case DayOfWeek.Sunday:
+                            resultMenu.AppendLine("일요일");
+                            break;
+                        case DayOfWeek.Monday:
+                            resultMenu.AppendLine("월요일");
+                            break;
+                        case DayOfWeek.Tuesday:
+                            resultMenu.AppendLine("화요일");
+                            break;
+                        case DayOfWeek.Wednesday:
+                            resultMenu.AppendLine("수요일");
+                            break;
+                        case DayOfWeek.Thursday:
+                            resultMenu.AppendLine("목요일");
+                            break;
+                        case DayOfWeek.Friday:
+                            resultMenu.AppendLine("금요일");
+                            break;
+                        case DayOfWeek.Saturday:
+                            resultMenu.AppendLine("토요일");
+                            break;
+                        default:
+                            break;
+                    }
+                    resultMenu.AppendLine("=============");
+
                     if (menu.Breakfast != null)
                     {
                         resultMenu.AppendLine("[아침]");
@@ -171,24 +197,21 @@ namespace SchoolMealBot.Dialogs
                             resultMenu.AppendLine(dinnerMenu);
                         }
                     }
-
-                    HeroCard heroCard = new HeroCard
-                    {
-                        Title = $"{menu.Date.Month}월 {menu.Date.Day}일",
-                        Text = resultMenu.ToString()
-                    };
-                    resultMsg.Attachments.Add(heroCard.ToAttachment());
+                    menu_list.Add(resultMenu.ToString());
                 }
                 
             }
 
-            if (resultMsg.Attachments.Count == 0)
+            if (menu_list.Count == 0)
             {
                 await context.PostAsync("선택한 날짜에 해당하는 급식메뉴가 없네요.");
             }
             else
             {
-                await context.PostAsync(resultMsg);
+                foreach (var menu in menu_list)
+                {
+                    await context.PostAsync(menu);
+                }
             }
 
             context.Done<object>(null);
