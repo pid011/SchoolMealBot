@@ -58,12 +58,17 @@ namespace SchoolMealBot.Dialogs
                 await context.PostAsync($"급식메뉴를 가져오는중 오류가 발생했어요 :( {ex.InnerException.Message}");
                 context.Done<object>(null);
             }
+            catch (Exception ex)
+            {
+                await context.PostAsync($"오류가 발생했어요 :( ---{ex.Message}");
+                context.Done<object>(null);
+            }
             
         }
 
         private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var todaysDate = DateTime.Today;
+            var todaysDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
             var list = new List<MealMenu>
             {
                 menus.Find(x => x.Date == todaysDate)
@@ -73,7 +78,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var tomorrowDate = DateTime.Today.AddDays(1);
+            var tomorrowDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today.AddDays(1), "Korea Standard Time");
             var tomorrowMenu = new List<MealMenu>();
             if (menus.Exists(x => x.Date == tomorrowDate))
             {
@@ -84,7 +89,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var todayDate = DateTime.Today;
+            var todayDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
             var datesOfWeek = GetDatesOfWeek(todayDate);
             var thisWeekMenu = new List<MealMenu>();
 
@@ -100,7 +105,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var NextWeekDate = DateTime.Today.AddDays(7);
+            var NextWeekDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today.AddDays(7), "Korea Standard Time");
             var datesOfWeek = GetDatesOfWeek(NextWeekDate);
             var nextWeekMenu = new List<MealMenu>();
 
