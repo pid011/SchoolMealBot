@@ -19,6 +19,7 @@ namespace SchoolMealBot.Dialogs
         private const string TomorrowsSchoolMealOption = "내일급식";
         private const string SchoolMealThisWeekOption = "이번주급식";
         private const string SchoolMealNextWeekOption = "다음주급식";
+        private const string SchoolInfoResetOption = "학교정보 초기화";
 
         private readonly List<string> options = new List<string>
         {
@@ -26,7 +27,8 @@ namespace SchoolMealBot.Dialogs
             TodaysSchoolMealOption,
             TomorrowsSchoolMealOption,
             SchoolMealThisWeekOption,
-            SchoolMealNextWeekOption
+            SchoolMealNextWeekOption,
+            SchoolInfoResetOption
         };
 
 #pragma warning disable CS1998
@@ -85,6 +87,10 @@ namespace SchoolMealBot.Dialogs
                         context.Call(new SchoolMealDialog(SchoolMealDialog.ResultType.SchoolMealNextWeek), AfterShowsSchoolMealListAsync);
                         break;
 
+                    case SchoolInfoResetOption:
+                        context.Call(new ResetDialog(), OnResetCompletedAsync);
+                        break;
+
                     default:
                         break;
                 }
@@ -94,6 +100,11 @@ namespace SchoolMealBot.Dialogs
                 await context.PostAsync("시도횟수가 너무 많아요. 다시 한번 시도해주세요. :<");
                 await ShowOptionsAsync(context);
             }
+        }
+
+        private async Task OnResetCompletedAsync(IDialogContext context, IAwaitable<object> result)
+        {
+            await ShowOptionsAsync(context);
         }
 
         private async Task AfterShowsSchoolMealListAsync(IDialogContext context, IAwaitable<object> result)
