@@ -194,5 +194,11 @@ namespace SchoolMealBot
             }
             return result;
         }
+
+        public enum YesNo
+        {
+            그래,
+            아니
+        }
     }
 }

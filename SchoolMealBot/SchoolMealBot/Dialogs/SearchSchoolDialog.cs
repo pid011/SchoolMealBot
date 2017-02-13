@@ -21,12 +21,6 @@ namespace SchoolMealBot.Dialogs
             this.userSchoolInfo = info;
         }
 
-        private enum YesNo
-        {
-            그래,
-            아니
-        }
-
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
@@ -94,15 +88,15 @@ namespace SchoolMealBot.Dialogs
             checkMsg.Attachments.Add(new HeroCard(title: selectedInfo.Name, text: selectedInfo.Adress).ToAttachment());
             await context.PostAsync(checkMsg);
 
-            var yesno = ((IEnumerable<YesNo>)Enum.GetValues(typeof(YesNo))).Select(x => x);
+            var yesno = ((IEnumerable<Util.YesNo>)Enum.GetValues(typeof(Util.YesNo))).Select(x => x);
             PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "이 학교정보로 설정할까요?", "정확하게 알려주세요!", promptStyle: PromptStyle.Keyboard);
         }
 
-        private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<YesNo> result)
+        private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<Util.YesNo> result)
         {
             var choiced = await result;
 
-            if (choiced == YesNo.그래)
+            if (choiced == Util.YesNo.그래)
             {
                 context.Done(this.resultSchoolInfo);
             }
