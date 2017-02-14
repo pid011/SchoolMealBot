@@ -14,37 +14,52 @@ namespace SchoolMealBot.Dialogs
     [Serializable]
     public class SchoolMealDialog : IDialog<object>
     {
-        private ResultType resultType;
+        private const string TodaysSchoolMealOption = "오늘급식";
+        private const string TomorrowsSchoolMealOption = "내일급식";
+        private const string SchoolMealThisWeekOption = "이번주급식";
+        private const string SchoolMealNextWeekOption = "다음주급식";
 
-        public SchoolMealDialog(ResultType type)
+        private readonly List<string> options = new List<string>
         {
-            this.resultType = type;
-        }
+            TodaysSchoolMealOption,
+            TomorrowsSchoolMealOption,
+            SchoolMealThisWeekOption,
+            SchoolMealNextWeekOption
+        };
 
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
+            PromptDialog.Choice(context, ResumeAfterChoicedAsync, this.options,
+                    "원하시는 옵션을 선택해주세요!", "목록에서 원하는 옵션을 선택해주세요!", promptStyle: PromptStyle.Auto);
+            
+            
+        }
+
+        private async Task ResumeAfterChoicedAsync(IDialogContext context, IAwaitable<string> result)
+        {
+            var resultType = await result;
             try
             {
                 var mealMenu = await GetSchoolMealListAsync(context);
 
                 if (mealMenu != null)
                 {
-                    switch (this.resultType)
+                    switch (resultType)
                     {
-                        case ResultType.TodaysSchoolMeal:
+                        case TodaysSchoolMealOption:
                             await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
                             break;
 
-                        case ResultType.TomorrowsSchoolMeal:
+                        case TomorrowsSchoolMealOption:
                             await ShowTomorrowsSchoolMealMenuAsync(context, mealMenu);
                             break;
 
-                        case ResultType.SchoolMealThisWeek:
+                        case SchoolMealThisWeekOption:
                             await ShowSchoolMealThisWeekMenuAsync(context, mealMenu);
                             break;
 
-                        case ResultType.SchoolMealNextWeek:
+                        case SchoolMealNextWeekOption:
                             await ShowSchoolMealNextWeekMenuAsync(context, mealMenu);
                             break;
 
@@ -63,7 +78,6 @@ namespace SchoolMealBot.Dialogs
                 await context.PostAsync($"오류가 발생했어요 :( ---{ex.Message}");
                 context.Done<object>(null);
             }
-            
         }
 
         private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
@@ -275,14 +289,6 @@ namespace SchoolMealBot.Dialogs
             dates.Sort((x, y) => x.CompareTo(y));
 
             return dates;
-        }
-
-        public enum ResultType
-        {
-            TodaysSchoolMeal,
-            TomorrowsSchoolMeal,
-            SchoolMealThisWeek,
-            SchoolMealNextWeek
         }
     }
 }

@@ -17,10 +17,7 @@ namespace SchoolMealBot.Dialogs
     public class RootDialog : IDialog<object>
     {
         private const string SettingsOption = "설정";
-        private const string TodaysSchoolMealOption = "오늘급식";
-        private const string TomorrowsSchoolMealOption = "내일급식";
-        private const string SchoolMealThisWeekOption = "이번주급식";
-        private const string SchoolMealNextWeekOption = "다음주급식";
+        private const string SchoolMealOption = "급식메뉴 보기";
         private const string SchoolInfoResetOption = "학교정보 초기화";
         private const string ViewDateOption = "현재 날짜";
         private const string RemoveUserStateOption = "유저정보 삭제";
@@ -28,10 +25,7 @@ namespace SchoolMealBot.Dialogs
         private readonly List<string> options = new List<string>
         {
             SettingsOption,
-            TodaysSchoolMealOption,
-            TomorrowsSchoolMealOption,
-            SchoolMealThisWeekOption,
-            SchoolMealNextWeekOption,
+            SchoolMealOption,
             SchoolInfoResetOption,
             ViewDateOption,
             RemoveUserStateOption
@@ -61,7 +55,7 @@ namespace SchoolMealBot.Dialogs
             else
             {
                 PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, 
-                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Auto);
+                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Keyboard);
             }
         }
 
@@ -78,20 +72,8 @@ namespace SchoolMealBot.Dialogs
                         context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
                         break;
 
-                    case TodaysSchoolMealOption:
-                        context.Call(new SchoolMealDialog(SchoolMealDialog.ResultType.TodaysSchoolMeal), AfterShowsSchoolMealListAsync);
-                        break;
-
-                    case TomorrowsSchoolMealOption:
-                        context.Call(new SchoolMealDialog(SchoolMealDialog.ResultType.TomorrowsSchoolMeal), AfterShowsSchoolMealListAsync);
-                        break;
-
-                    case SchoolMealThisWeekOption:
-                        context.Call(new SchoolMealDialog(SchoolMealDialog.ResultType.SchoolMealThisWeek), AfterShowsSchoolMealListAsync);
-                        break;
-
-                    case SchoolMealNextWeekOption:
-                        context.Call(new SchoolMealDialog(SchoolMealDialog.ResultType.SchoolMealNextWeek), AfterShowsSchoolMealListAsync);
+                    case SchoolMealOption:
+                        context.Call(new SchoolMealDialog(), AfterShowsSchoolMealListAsync);
                         break;
 
                     case SchoolInfoResetOption:
