@@ -69,11 +69,12 @@ namespace SchoolMealBot.Dialogs
         private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todaysDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
-            var list = new List<MealMenu>
+            var todayMenu = new List<MealMenu>();
+            if (menus.Exists(x => x.Date == todaysDate))
             {
-                menus.Find(x => x.Date == todaysDate)
-            };
-            await ShowMessageAsync(context, list);
+                todayMenu.Add(menus.Find(x => x.Date == todaysDate));
+            }
+            await ShowMessageAsync(context, todayMenu);
         }
 
         private async Task ShowTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
@@ -129,7 +130,15 @@ namespace SchoolMealBot.Dialogs
             else
             {
                 var meal = new Meal(Util.ConvertRegions(schoolInfo.Region), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.Code);
-                menus = meal.GetMealMenu();
+                try
+                {
+                    menus = meal.GetMealMenu();
+                }
+                catch (SchoolMeal.Exception.FaildToParseException ex)
+                {
+                    await context.PostAsync("급식정보를 가져오는 도중에 문제가 발생 했어요 :( " + ex.Message);
+                    context.Done<object>(null);
+                }
             }
             return menus;
         }

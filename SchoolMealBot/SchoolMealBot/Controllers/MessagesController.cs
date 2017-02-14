@@ -9,6 +9,9 @@ using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder.Dialogs;
 using SchoolMealBot.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Internals;
+using System.Threading;
+using Autofac;
 
 namespace SchoolMealBot
 {

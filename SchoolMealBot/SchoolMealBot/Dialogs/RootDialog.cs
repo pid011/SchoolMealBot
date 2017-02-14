@@ -8,6 +8,8 @@ using Microsoft.Bot.Connector;
 using SchoolMeal;
 using System.Threading;
 using SchoolFinder;
+using Microsoft.Bot.Builder.Dialogs.Internals;
+using Autofac;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -20,6 +22,8 @@ namespace SchoolMealBot.Dialogs
         private const string SchoolMealThisWeekOption = "이번주급식";
         private const string SchoolMealNextWeekOption = "다음주급식";
         private const string SchoolInfoResetOption = "학교정보 초기화";
+        private const string ViewDateOption = "현재 날짜";
+        private const string RemoveUserStateOption = "유저정보 삭제";
 
         private readonly List<string> options = new List<string>
         {
@@ -28,7 +32,9 @@ namespace SchoolMealBot.Dialogs
             TomorrowsSchoolMealOption,
             SchoolMealThisWeekOption,
             SchoolMealNextWeekOption,
-            SchoolInfoResetOption
+            SchoolInfoResetOption,
+            ViewDateOption,
+            RemoveUserStateOption
         };
 
 #pragma warning disable CS1998
@@ -46,7 +52,8 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowOptionsAsync(IDialogContext context)
         {
-            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo))
+            var check = context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo);
+            if (!check || botInfo == null)
             {
                 await context.PostAsync("먼저 지금 다니는 학교를 설정해야 해요.");
                 context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
@@ -54,7 +61,7 @@ namespace SchoolMealBot.Dialogs
             else
             {
                 PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, 
-                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Keyboard);
+                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Auto);
             }
         }
 
@@ -89,6 +96,14 @@ namespace SchoolMealBot.Dialogs
 
                     case SchoolInfoResetOption:
                         context.Call(new ResetDialog(), OnResetCompletedAsync);
+                        break;
+
+                    case ViewDateOption:
+                        await ViewCurrentDate(context);
+                        break;
+
+                    case RemoveUserStateOption:
+                        await RemoveBotState(context);
                         break;
 
                     default:
@@ -132,6 +147,41 @@ namespace SchoolMealBot.Dialogs
                 await context.PostAsync("설정을 중단했어요!");
                 await context.PostAsync("저에게 다시 말을 걸어주세요!");
                 context.Wait(MessageReceivedAsync);
+            }
+        }
+
+        private async Task ViewCurrentDate(IDialogContext context)
+        {
+            var todaysDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
+            await context.PostAsync($"현재 날짜는 {todaysDate.ToLongDateString()}입니다.");
+            await ShowOptionsAsync(context);
+        }
+
+        private async Task RemoveBotState(IDialogContext context)
+        {
+            var yesno = ((IEnumerable<Util.YesNo>)Enum.GetValues(typeof(Util.YesNo))).Select(x => x);
+            PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "정말로 유저정보를 삭제할까요?", "정확하게 알려주세요!", promptStyle: PromptStyle.Keyboard);
+        }
+
+        private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<Util.YesNo> result)
+        {
+            if (context.Activity is Activity activity)
+            {
+                try
+                {
+                    context.ConversationData.Clear();
+                    activity.GetStateClient().BotState.DeleteStateForUser(activity.ChannelId, activity.From.Id);
+                    await context.PostAsync("유저정보 삭제에 성공했어요. 다시 말을걸면 봇이 재시작됩니다 :l");
+                    context.Done<object>(null);
+                }
+                catch (Exception ex)
+                {
+                    await context.PostAsync("유저정보 삭제에 실패했어요 :( " + ex.Message);
+                }
+            }
+            else
+            {
+                await context.PostAsync("유저정보 삭제에 실패했어요 :(");
             }
         }
     }
