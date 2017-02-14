@@ -132,7 +132,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="ContextConstants.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
-    <Compile Include="Dialogs\ResetDialog.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\SchoolInfoConfigDialog.cs" />
     <Compile Include="Dialogs\SchoolMealDialog.cs" />

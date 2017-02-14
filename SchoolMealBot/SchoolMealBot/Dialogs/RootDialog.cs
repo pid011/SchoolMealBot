@@ -18,17 +18,15 @@ namespace SchoolMealBot.Dialogs
     {
         private const string SettingsOption = "설정";
         private const string SchoolMealOption = "급식메뉴 보기";
-        private const string SchoolInfoResetOption = "학교정보 초기화";
         private const string ViewDateOption = "현재 날짜";
-        private const string RemoveUserStateOption = "유저정보 삭제";
+        private const string RemoveUserDataOption = "유저정보 삭제";
 
         private readonly List<string> options = new List<string>
         {
             SettingsOption,
             SchoolMealOption,
-            SchoolInfoResetOption,
             ViewDateOption,
-            RemoveUserStateOption
+            RemoveUserDataOption
         };
 
 #pragma warning disable CS1998
@@ -76,16 +74,12 @@ namespace SchoolMealBot.Dialogs
                         context.Call(new SchoolMealDialog(), AfterShowsSchoolMealListAsync);
                         break;
 
-                    case SchoolInfoResetOption:
-                        context.Call(new ResetDialog(), OnResetCompletedAsync);
-                        break;
-
                     case ViewDateOption:
                         await ViewCurrentDate(context);
                         break;
 
-                    case RemoveUserStateOption:
-                        await RemoveBotState(context);
+                    case RemoveUserDataOption:
+                        await RemoveUserData(context);
                         break;
 
                     default:
@@ -139,7 +133,7 @@ namespace SchoolMealBot.Dialogs
             await ShowOptionsAsync(context);
         }
 
-        private async Task RemoveBotState(IDialogContext context)
+        private async Task RemoveUserData(IDialogContext context)
         {
             var yesno = ((IEnumerable<Util.YesNo>)Enum.GetValues(typeof(Util.YesNo))).Select(x => x);
             PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "정말로 유저정보를 삭제할까요?", "정확하게 알려주세요!", promptStyle: PromptStyle.Keyboard);
@@ -152,7 +146,6 @@ namespace SchoolMealBot.Dialogs
                 try
                 {
                     context.ConversationData.Clear();
-                    activity.GetStateClient().BotState.DeleteStateForUser(activity.ChannelId, activity.From.Id);
                     await context.PostAsync("유저정보 삭제에 성공했어요. 다시 말을걸면 봇이 재시작됩니다 :l");
                     context.Done<object>(null);
                 }
