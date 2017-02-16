@@ -1,10 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Threading.Tasks;
-using Microsoft.Bot.Connector;
 using SchoolMeal;
 using SchoolFinder;
 using System.Text;
@@ -14,6 +11,8 @@ namespace SchoolMealBot.Dialogs
     [Serializable]
     public class SchoolMealDialog : IDialog<object>
     {
+        private SchoolInfo schoolInfo;
+
         private const string TodaysSchoolMealOption = "오늘급식";
         private const string TomorrowsSchoolMealOption = "내일급식";
         private const string SchoolMealThisWeekOption = "이번주급식";
@@ -27,62 +26,53 @@ namespace SchoolMealBot.Dialogs
             SchoolMealNextWeekOption
         };
 
+        public SchoolMealDialog(SchoolInfo schoolInfo)
+        {
+            this.schoolInfo = schoolInfo;
+        }
+
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
             PromptDialog.Choice(context, ResumeAfterChoicedAsync, this.options,
-                    "원하시는 옵션을 선택해주세요!", "목록에서 원하는 옵션을 선택해주세요!", promptStyle: PromptStyle.Auto);
-            
-            
+                    "원하시는 옵션을 선택해주세요!", "목록에서 원하는 옵션을 선택해주세요!");
         }
 
         private async Task ResumeAfterChoicedAsync(IDialogContext context, IAwaitable<string> result)
         {
             var resultType = await result;
-            try
-            {
-                var mealMenu = await GetSchoolMealListAsync(context);
 
-                if (mealMenu != null)
+            var mealMenu = await GetSchoolMealListAsync(context);
+
+            if (mealMenu != null)
+            {
+                switch (resultType)
                 {
-                    switch (resultType)
-                    {
-                        case TodaysSchoolMealOption:
-                            await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
-                            break;
+                    case TodaysSchoolMealOption:
+                        await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
+                        break;
 
-                        case TomorrowsSchoolMealOption:
-                            await ShowTomorrowsSchoolMealMenuAsync(context, mealMenu);
-                            break;
+                    case TomorrowsSchoolMealOption:
+                        await ShowTomorrowsSchoolMealMenuAsync(context, mealMenu);
+                        break;
 
-                        case SchoolMealThisWeekOption:
-                            await ShowSchoolMealThisWeekMenuAsync(context, mealMenu);
-                            break;
+                    case SchoolMealThisWeekOption:
+                        await ShowSchoolMealThisWeekMenuAsync(context, mealMenu);
+                        break;
 
-                        case SchoolMealNextWeekOption:
-                            await ShowSchoolMealNextWeekMenuAsync(context, mealMenu);
-                            break;
+                    case SchoolMealNextWeekOption:
+                        await ShowSchoolMealNextWeekMenuAsync(context, mealMenu);
+                        break;
 
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
-            }
-            catch (SchoolMeal.Exception.FaildToParseException ex)
-            {
-                await context.PostAsync($"급식메뉴를 가져오는중 오류가 발생했어요 :( {ex.InnerException.Message}");
-                context.Done<object>(null);
-            }
-            catch (Exception ex)
-            {
-                await context.PostAsync($"오류가 발생했어요 :( ---{ex.Message}");
-                context.Done<object>(null);
             }
         }
 
         private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var todaysDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
+            var todaysDate = DateTime.Now;
             var todayMenu = new List<MealMenu>();
             if (menus.Exists(x => x.Date == todaysDate))
             {
@@ -93,7 +83,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var tomorrowDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today.AddDays(1), "Korea Standard Time");
+            var tomorrowDate = DateTime.Now;
             var tomorrowMenu = new List<MealMenu>();
             if (menus.Exists(x => x.Date == tomorrowDate))
             {
@@ -104,7 +94,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var todayDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
+            var todayDate = DateTime.Now;
             var datesOfWeek = GetDatesOfWeek(todayDate);
             var thisWeekMenu = new List<MealMenu>();
 
@@ -120,7 +110,7 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var NextWeekDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today.AddDays(7), "Korea Standard Time");
+            var NextWeekDate = DateTime.Now;
             var datesOfWeek = GetDatesOfWeek(NextWeekDate);
             var nextWeekMenu = new List<MealMenu>();
 
@@ -137,23 +127,18 @@ namespace SchoolMealBot.Dialogs
         private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context)
         {
             List<MealMenu> menus = null;
-            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo schoolInfo))
+
+            var meal = new Meal(Util.ConvertRegions(this.schoolInfo.Region), Util.ConvertSchoolTypes(this.schoolInfo.SchoolType), this.schoolInfo.Code);
+            try
             {
-                await context.PostAsync("저장되어있는 학교정보가 없어요!");
+                menus = meal.GetMealMenu();
             }
-            else
+            catch (SchoolMeal.Exception.FaildToParseException ex)
             {
-                var meal = new Meal(Util.ConvertRegions(schoolInfo.Region), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.Code);
-                try
-                {
-                    menus = meal.GetMealMenu();
-                }
-                catch (SchoolMeal.Exception.FaildToParseException ex)
-                {
-                    await context.PostAsync("급식정보를 가져오는 도중에 문제가 발생 했어요 :( " + ex.Message);
-                    context.Done<object>(null);
-                }
+                await context.PostAsync("급식정보를 가져오는 도중에 문제가 발생 했어요 :( " + ex.Message);
+                context.Done<object>(null);
             }
+
             return menus;
         }
 
@@ -248,35 +233,8 @@ namespace SchoolMealBot.Dialogs
         private List<DateTime> GetDatesOfWeek(DateTime date)
         {
             List<DateTime> dates = new List<DateTime> { date };
-            int num = 0;
 
-            switch (date.DayOfWeek)
-            {
-                case DayOfWeek.Monday:
-                    num = 0;
-                    break;
-                case DayOfWeek.Tuesday:
-                    num = 1;
-                    break;
-                case DayOfWeek.Wednesday:
-                    num = 2;
-                    break;
-                case DayOfWeek.Thursday:
-                    num = 3;
-                    break;
-                case DayOfWeek.Friday:
-                    num = 4;
-                    break;
-                case DayOfWeek.Saturday:
-                    num = 5;
-                    break;
-                case DayOfWeek.Sunday:
-                    num = 6;
-                    break;
-                default:
-                    break;
-            }
-
+            int num = (int)DateTime.Now.DayOfWeek;
             for (int i = 1; i <= num; i++)
             {
                 dates.Add(date.Subtract(new TimeSpan(i, 0, 0, 0, 0)));

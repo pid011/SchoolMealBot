@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder.FormFlow;
 using SchoolFinder;
-using Microsoft.Bot.Connector;
 
 namespace SchoolMealBot.Dialogs
 {

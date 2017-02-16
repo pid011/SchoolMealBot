@@ -2,36 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
-using SchoolMeal;
-using System.Threading;
 using SchoolFinder;
-using Microsoft.Bot.Builder.Dialogs.Internals;
-using Autofac;
-using System.Net.Sockets;
-using System.IO;
 
 namespace SchoolMealBot.Dialogs
 {
     [Serializable]
     public class RootDialog : IDialog<object>
     {
+        private SchoolInfo schoolInfo;
+
         private const string SettingsOption = "설정";
         private const string SchoolMealOption = "급식메뉴 보기";
         private const string RemoveUserDataOption = "유저정보 삭제";
 
         private readonly List<string> options = new List<string>
         {
-            SettingsOption,
             SchoolMealOption,
+            SettingsOption,
             RemoveUserDataOption
         };
+        private bool welcomed;
 
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
+            await context.PostAsync("안녕하세요! 저는 급식봇이에요. 급식메뉴를 알려준답니다.");
             context.Wait(MessageReceivedAsync);
         }
 
@@ -39,25 +36,23 @@ namespace SchoolMealBot.Dialogs
         {
             var message = await result;
 
-            await ShowOptionsAsync(context);
-        }
-
-        private async Task ShowOptionsAsync(IDialogContext context)
-        {
-            var check = context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo);
-            if (!check || botInfo == null)
+            if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo schoolInfo))
             {
-                await context.PostAsync("안녕하세요 :D");
-                await context.PostAsync("저장되어있는 정보가 없어요. 설정을 해야해요.");
+                this.welcomed = true;
+                await context.PostAsync("저장되어있는 정보가 없어 설정을 시작합니다.");
                 context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
             }
             else
             {
-                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options, 
-                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!", promptStyle: PromptStyle.Keyboard);
+                if (!this.welcomed)
+                {
+                    this.welcomed = true;
+                    await context.PostAsync("🎉 다시 오신걸 환영합니다! 🎉");
+                }
+                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options,
+                    "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!");
             }
         }
-
 
         private async Task OnOptionSelectedAsync(IDialogContext context, IAwaitable<string> result)
         {
@@ -67,12 +62,12 @@ namespace SchoolMealBot.Dialogs
 
                 switch (optionSelected)
                 {
-                    case SettingsOption:
-                        context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
+                    case SchoolMealOption:
+                        context.Call(new SchoolMealDialog(this.schoolInfo), AfterShowsSchoolMealListAsync);
                         break;
 
-                    case SchoolMealOption:
-                        context.Call(new SchoolMealDialog(), AfterShowsSchoolMealListAsync);
+                    case SettingsOption:
+                        context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
                         break;
 
                     case RemoveUserDataOption:
@@ -86,13 +81,13 @@ namespace SchoolMealBot.Dialogs
             catch (TooManyAttemptsException)
             {
                 await context.PostAsync("시도횟수가 너무 많아요. 다시 한번 시도해주세요. :<");
-                await ShowOptionsAsync(context);
+                context.Wait(MessageReceivedAsync);
             }
         }
 
         private async Task AfterShowsSchoolMealListAsync(IDialogContext context, IAwaitable<object> result)
         {
-            await ShowOptionsAsync(context);
+            context.Wait(MessageReceivedAsync);
         }
 
         private async Task OnConfigSchoolInfoAsync(IDialogContext context, IAwaitable<SchoolInfo> result)
@@ -107,21 +102,20 @@ namespace SchoolMealBot.Dialogs
             if (info != null)
             {
                 context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, info);
+                this.schoolInfo = info;
                 await context.PostAsync("설정을 완료했어요!");
-                await ShowOptionsAsync(context);
             }
             else
             {
                 await context.PostAsync("설정을 중단했어요!");
-                await context.PostAsync("저에게 다시 말을 걸어주세요!");
-                context.Wait(MessageReceivedAsync);
             }
+            context.Wait(MessageReceivedAsync);
         }
 
         private async Task RemoveUserData(IDialogContext context)
         {
             var yesno = ((IEnumerable<Util.YesNo>)Enum.GetValues(typeof(Util.YesNo))).Select(x => x);
-            PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "정말로 유저정보를 삭제할까요?", "정확하게 알려주세요!", promptStyle: PromptStyle.Keyboard);
+            PromptDialog.Choice(context, OnSeletedYesNoAsync, yesno, "정말로 유저정보를 삭제할까요?", "정확하게 알려주세요!");
         }
 
         private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<Util.YesNo> result)
@@ -137,11 +131,13 @@ namespace SchoolMealBot.Dialogs
                 catch (Exception ex)
                 {
                     await context.PostAsync("유저정보 삭제에 실패했어요 :( " + ex.Message);
+                    context.Wait(MessageReceivedAsync);
                 }
             }
             else
             {
                 await context.PostAsync("유저정보 삭제에 실패했어요 :(");
+                context.Wait(MessageReceivedAsync);
             }
         }
     }
