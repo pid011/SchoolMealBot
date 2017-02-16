@@ -47,7 +47,8 @@ namespace SchoolMealBot.Dialogs
             var check = context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo botInfo);
             if (!check || botInfo == null)
             {
-                await context.PostAsync("먼저 지금 다니는 학교를 설정해야 해요.");
+                await context.PostAsync("안녕하세요 :D");
+                await context.PostAsync("저장되어있는 정보가 없어요. 설정을 해야해요.");
                 context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
             }
             else
