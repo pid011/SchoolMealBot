@@ -10,6 +10,8 @@ using System.Threading;
 using SchoolFinder;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Autofac;
+using System.Net.Sockets;
+using System.IO;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -18,14 +20,12 @@ namespace SchoolMealBot.Dialogs
     {
         private const string SettingsOption = "설정";
         private const string SchoolMealOption = "급식메뉴 보기";
-        private const string ViewDateOption = "현재 날짜";
         private const string RemoveUserDataOption = "유저정보 삭제";
 
         private readonly List<string> options = new List<string>
         {
             SettingsOption,
             SchoolMealOption,
-            ViewDateOption,
             RemoveUserDataOption
         };
 
@@ -74,10 +74,6 @@ namespace SchoolMealBot.Dialogs
                         context.Call(new SchoolMealDialog(), AfterShowsSchoolMealListAsync);
                         break;
 
-                    case ViewDateOption:
-                        await ViewCurrentDate(context);
-                        break;
-
                     case RemoveUserDataOption:
                         await RemoveUserData(context);
                         break;
@@ -124,13 +120,6 @@ namespace SchoolMealBot.Dialogs
                 await context.PostAsync("저에게 다시 말을 걸어주세요!");
                 context.Wait(MessageReceivedAsync);
             }
-        }
-
-        private async Task ViewCurrentDate(IDialogContext context)
-        {
-            var todaysDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Today, "Korea Standard Time");
-            await context.PostAsync($"현재 날짜는 {todaysDate.ToLongDateString()}입니다.");
-            await ShowOptionsAsync(context);
         }
 
         private async Task RemoveUserData(IDialogContext context)
