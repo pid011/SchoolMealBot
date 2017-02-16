@@ -90,11 +90,6 @@ namespace SchoolMealBot.Dialogs
             }
         }
 
-        private async Task OnResetCompletedAsync(IDialogContext context, IAwaitable<object> result)
-        {
-            await ShowOptionsAsync(context);
-        }
-
         private async Task AfterShowsSchoolMealListAsync(IDialogContext context, IAwaitable<object> result)
         {
             await ShowOptionsAsync(context);
