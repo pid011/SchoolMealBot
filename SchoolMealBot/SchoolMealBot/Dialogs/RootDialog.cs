@@ -120,25 +120,43 @@ namespace SchoolMealBot.Dialogs
 
         private async Task OnSeletedYesNoAsync(IDialogContext context, IAwaitable<Util.YesNo> result)
         {
-            if (context.Activity is Activity activity)
+            var choiced = await result;
+
+            switch (choiced)
             {
-                try
-                {
-                    context.ConversationData.Clear();
-                    await context.PostAsync("유저정보 삭제에 성공했어요. 다시 말을걸면 봇이 재시작됩니다 :l");
-                    context.Done<object>(null);
-                }
-                catch (Exception ex)
-                {
-                    await context.PostAsync("유저정보 삭제에 실패했어요 :( " + ex.Message);
+                case Util.YesNo.그래:
+                    {
+                        if (context.Activity is Activity activity)
+                        {
+                            try
+                            {
+                                context.ConversationData.Clear();
+                                await context.PostAsync("유저정보 삭제에 성공했어요. 다시 말을걸면 봇이 재시작됩니다 :l");
+                                context.Done<object>(null);
+                            }
+                            catch (Exception ex)
+                            {
+                                await context.PostAsync("유저정보 삭제에 실패했어요 :( " + ex.Message);
+                                context.Wait(MessageReceivedAsync);
+                            }
+                        }
+                        else
+                        {
+                            await context.PostAsync("유저정보 삭제에 실패했어요 :(");
+                            context.Wait(MessageReceivedAsync);
+                        }
+                    }
+                    break;
+
+                case Util.YesNo.아니:
+                    await context.PostAsync("유저정보 삭제를 취소했어요 :D");
                     context.Wait(MessageReceivedAsync);
-                }
+                    break;
+
+                default:
+                    break;
             }
-            else
-            {
-                await context.PostAsync("유저정보 삭제에 실패했어요 :(");
-                context.Wait(MessageReceivedAsync);
-            }
+            
         }
     }
 }
