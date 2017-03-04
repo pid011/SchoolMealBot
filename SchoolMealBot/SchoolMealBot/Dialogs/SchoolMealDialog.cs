@@ -76,7 +76,7 @@ namespace SchoolMealBot.Dialogs
             var todayMenu = new List<MealMenu>();
             if (menus.Exists(x => x.Date == todaysDate))
             {
-                todayMenu.Add(menus.Find(x => x.Date == todaysDate));
+                todayMenu.Add(menus.Find(x => x.Date.Date == todaysDate.Date));
             }
             await ShowMessageAsync(context, todayMenu);
         }
@@ -87,7 +87,7 @@ namespace SchoolMealBot.Dialogs
             var tomorrowMenu = new List<MealMenu>();
             if (menus.Exists(x => x.Date == tomorrowDate))
             {
-                tomorrowMenu.Add(menus.Find(x => x.Date == tomorrowDate));
+                tomorrowMenu.Add(menus.Find(x => x.Date.Date == tomorrowDate.Date));
             }
             await ShowMessageAsync(context, tomorrowMenu);
         }
@@ -100,9 +100,9 @@ namespace SchoolMealBot.Dialogs
 
             foreach (var date in datesOfWeek)
             {
-                if (menus.Exists(x => x.Date == date))
+                if (menus.Exists(x => x.Date.Date == date.Date))
                 {
-                    thisWeekMenu.Add(menus.Find(x => x.Date == date));
+                    thisWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
                 }
             }
             await ShowMessageAsync(context, thisWeekMenu);
@@ -110,15 +110,15 @@ namespace SchoolMealBot.Dialogs
 
         private async Task ShowSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
-            var NextWeekDate = DateTime.Now;
+            var NextWeekDate = DateTime.Now.AddDays(7);
             var datesOfWeek = GetDatesOfWeek(NextWeekDate);
             var nextWeekMenu = new List<MealMenu>();
 
             foreach (var date in datesOfWeek)
             {
-                if (menus.Exists(x => x.Date == date))
+                if (menus.Exists(x => x.Date.Date == date.Date))
                 {
-                    nextWeekMenu.Add(menus.Find(x => x.Date == date));
+                    nextWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
                 }
             }
             await ShowMessageAsync(context, nextWeekMenu);
