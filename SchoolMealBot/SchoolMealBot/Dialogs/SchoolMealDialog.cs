@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using SchoolMeal;
 using SchoolFinder;
 using System.Text;
+using Microsoft.Bot.Connector;
+using SchoolMealBot.Core.Image;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -44,24 +46,28 @@ namespace SchoolMealBot.Dialogs
 
             var mealMenu = await GetSchoolMealListAsync(context);
 
+            var replyMsg = context.MakeMessage();
+
+            Attachment attachment = null;
+
             if (mealMenu != null)
             {
                 switch (resultType)
                 {
                     case TodaysSchoolMealOption:
-                        await ShowTodaysSchoolMealMenuAsync(context, mealMenu);
+                        attachment = await GetTodaysSchoolMealMenuAsync(context, mealMenu);
                         break;
 
                     case TomorrowsSchoolMealOption:
-                        await ShowTomorrowsSchoolMealMenuAsync(context, mealMenu);
+                        attachment = await GetTomorrowsSchoolMealMenuAsync(context, mealMenu);
                         break;
 
                     case SchoolMealThisWeekOption:
-                        await ShowSchoolMealThisWeekMenuAsync(context, mealMenu);
+                        attachment = await GetSchoolMealThisWeekMenuAsync(context, mealMenu);
                         break;
 
                     case SchoolMealNextWeekOption:
-                        await ShowSchoolMealNextWeekMenuAsync(context, mealMenu);
+                        attachment = await GetSchoolMealNextWeekMenuAsync(context, mealMenu);
                         break;
 
                     default:
@@ -70,29 +76,51 @@ namespace SchoolMealBot.Dialogs
             }
         }
 
-        private async Task ShowTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
+        private async Task<Attachment> GetTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todaysDate = DateTime.Now;
-            var todayMenu = new List<MealMenu>();
+            MealMenu todayMenu = null;
             if (menus.Exists(x => x.Date == todaysDate))
             {
-                todayMenu.Add(menus.Find(x => x.Date.Date == todaysDate.Date));
+                todayMenu = menus.Find(x => x.Date.Date == todaysDate.Date);
             }
-            await ShowMessageAsync(context, todayMenu);
+
+            List<CardImage> cardImages = new List<CardImage>()
+            {
+                new CardImage(url: MenuFactory.MakeImage(context.Activity.Conversation.Id, todayMenu))
+            };
+
+            var card = new HeroCard()
+            {
+                Images = cardImages
+            };
+
+            return card.ToAttachment();
         }
 
-        private async Task ShowTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
+        private async Task<Attachment> GetTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var tomorrowDate = DateTime.Now;
-            var tomorrowMenu = new List<MealMenu>();
+            MealMenu tomorrowMenu = null;
             if (menus.Exists(x => x.Date == tomorrowDate))
             {
-                tomorrowMenu.Add(menus.Find(x => x.Date.Date == tomorrowDate.Date));
+                tomorrowMenu = menus.Find(x => x.Date.Date == tomorrowDate.Date);
             }
-            await ShowMessageAsync(context, tomorrowMenu);
+
+            List<CardImage> cardImages = new List<CardImage>()
+            {
+                new CardImage(url: MenuFactory.MakeImage(context.Activity.Conversation.Id, tomorrowMenu))
+            };
+
+            var card = new HeroCard()
+            {
+                Images = cardImages
+            };
+
+            return card.ToAttachment();
         }
 
-        private async Task ShowSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
+        private async Task<Attachment> GetSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todayDate = DateTime.Now;
             var datesOfWeek = GetDatesOfWeek(todayDate);
@@ -105,10 +133,22 @@ namespace SchoolMealBot.Dialogs
                     thisWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
                 }
             }
-            await ShowMessageAsync(context, thisWeekMenu);
+
+            List<CardImage> cardImages = new List<CardImage>();
+            foreach (var menu in thisWeekMenu)
+            {
+                cardImages.Add(new CardImage(url: MenuFactory.MakeImage(context.Activity.Conversation.Id, menu)));
+            }
+
+            var card = new HeroCard()
+            {
+                Images = cardImages
+            };
+
+            return card.ToAttachment();
         }
 
-        private async Task ShowSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
+        private async Task<Attachment> GetSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var NextWeekDate = DateTime.Now.AddDays(7);
             var datesOfWeek = GetDatesOfWeek(NextWeekDate);
@@ -121,7 +161,19 @@ namespace SchoolMealBot.Dialogs
                     nextWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
                 }
             }
-            await ShowMessageAsync(context, nextWeekMenu);
+
+            List<CardImage> cardImages = new List<CardImage>();
+            foreach (var menu in nextWeekMenu)
+            {
+                cardImages.Add(new CardImage(url: MenuFactory.MakeImage(context.Activity.Conversation.Id, menu)));
+            }
+
+            var card = new HeroCard()
+            {
+                Images = cardImages
+            };
+
+            return card.ToAttachment();
         }
 
         private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context)
