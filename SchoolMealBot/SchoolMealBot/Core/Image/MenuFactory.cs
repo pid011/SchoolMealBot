@@ -8,11 +8,15 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Text;
+using ImageShackApi;
+using System.IO;
 
 namespace SchoolMealBot.Core.Image
 {
     public class MenuFactory
     {
+        private const string ApiKey = "269EFIJL61c2b056e30d6c142b1714e26725e591";
+
         public static string MakeImage(string userId, MealMenu menu)
         {
             var filename = GetRandomFileName(userId);
@@ -33,9 +37,26 @@ namespace SchoolMealBot.Core.Image
 
             g.Flush();
 
-            bmp.Save(@"Results\Menu\" + filename, ImageFormat.Png);
-            //////////////////////////////////////////////////////////////////
-            return "";
+            var filePath = Path.Combine(Environment.CurrentDirectory, "SchoolMenu", filename);
+            bmp.Save(filePath, ImageFormat.Jpeg);
+
+            UploadResult result = null;
+            try
+            {
+                result = UploadImage(filePath);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return result.Links.ImageLink;
+        }
+
+        private static UploadResult UploadImage(string filepath)
+        {
+            ImageShackUploader.ApiKey = ApiKey;
+            return ImageShackUploader.UploadImage(filepath);
         }
 
         private static string GetRandomFileName(string userId)
