@@ -41,7 +41,7 @@ namespace SchoolMealBot.Core.Image
                 width = defaultWidth;
             }
 
-            var height = menuStrings.Count * 20;
+            var height = menuStrings.Count * 24;
 
             Bitmap bitmap = new Bitmap(width, height); //load the image file
 
@@ -52,8 +52,8 @@ namespace SchoolMealBot.Core.Image
                     float yPoint = 10f;
                     foreach (var str in menuStrings)
                     {
-                        graphics.DrawString(str, writeFont, Brushes.White, new PointF(10f, yPoint));
-                        yPoint += 15f;
+                        graphics.DrawString(str, writeFont, Brushes.White, new PointF(15f, yPoint));
+                        yPoint += 20f;
                     }
                 }
             }
