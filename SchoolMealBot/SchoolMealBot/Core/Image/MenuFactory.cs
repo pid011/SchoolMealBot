@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using ImageShackApi;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace SchoolMealBot.Core.Image
 {
@@ -17,28 +18,51 @@ namespace SchoolMealBot.Core.Image
     {
         private const string ApiKey = "269EFIJL61c2b056e30d6c142b1714e26725e591";
 
-        public static string MakeImage(string userId, MealMenu menu)
+        public static async Task<string> MakeImage(string userId, MealMenu menu)
         {
-            var filename = GetRandomFileName(userId);
+            var filename = GetRandomFileName(userId) + ".jpg";
+            var directoryPath = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), "SchoolMealMenu");
+            var filePath = Path.Combine(directoryPath, filename);
 
             List<string> menuStrings = Regex.Split(menu.ToString(), "\r\n|\r|\n").ToList();
 
-            Bitmap bmp = new Bitmap(100, 200);
+            var width = 0;
+            var defaultWidth = 500;
+            foreach (var str in menuStrings)
+            {
+                if (str.Length > width)
+                {
+                    width = str.Length;
+                }
+            }
+            width += 40;
+            if (width < defaultWidth)
+            {
+                width = defaultWidth;
+            }
 
-            RectangleF rectf = new RectangleF(70, 90, 90, 50);
+            var height = menuStrings.Count * 20;
 
-            Graphics g = Graphics.FromImage(bmp);
+            Bitmap bitmap = new Bitmap(width, height); //load the image file
 
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            // fix this code
-            g.DrawString("yourText", new Font(@"Assets\Fonts\NanumGothic.ttf#나눔고딕", 10), Brushes.White, rectf);
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                using (Font writeFont = new Font("Malgun Gothic", 12))
+                {
+                    float yPoint = 10f;
+                    foreach (var str in menuStrings)
+                    {
+                        graphics.DrawString(str, writeFont, Brushes.White, new PointF(10f, yPoint));
+                        yPoint += 15f;
+                    }
+                }
+            }
 
-            g.Flush();
-
-            var filePath = Path.Combine(Environment.CurrentDirectory, "SchoolMenu", filename);
-            bmp.Save(filePath, ImageFormat.Jpeg);
+            await Task.Run(() =>
+            {
+                Directory.CreateDirectory(directoryPath);
+                bitmap.Save(filePath, ImageFormat.Jpeg); //save the image file
+            });
 
             UploadResult result = null;
             try
