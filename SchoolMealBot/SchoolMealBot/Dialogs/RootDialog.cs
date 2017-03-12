@@ -38,18 +38,18 @@ namespace SchoolMealBot.Dialogs
 
             if (!context.ConversationData.TryGetValue(ContextConstants.SchoolConfigKey, out SchoolInfo schoolInfo))
             {
-                this.welcomed = true;
+                welcomed = true;
                 await context.PostAsync("저장되어있는 정보가 없어 설정을 시작합니다.");
                 context.Call(new SchoolInfoConfigDialog(), OnConfigSchoolInfoAsync);
             }
             else
             {
-                if (!this.welcomed)
+                if (!welcomed)
                 {
-                    this.welcomed = true;
+                    welcomed = true;
                     await context.PostAsync("🎉 다시 오신걸 환영합니다! 🎉");
                 }
-                PromptDialog.Choice(context, OnOptionSelectedAsync, this.options,
+                PromptDialog.Choice(context, OnOptionSelectedAsync, options,
                     "무엇을 도와드릴까요?", "목록에서 원하는 작업을 선택해주세요!");
             }
         }
@@ -63,7 +63,7 @@ namespace SchoolMealBot.Dialogs
                 switch (optionSelected)
                 {
                     case SchoolMealOption:
-                        context.Call(new SchoolMealDialog(this.schoolInfo), AfterShowsSchoolMealListAsync);
+                        context.Call(new SchoolMealDialog(schoolInfo), AfterShowsSchoolMealListAsync);
                         break;
 
                     case SettingsOption:
@@ -102,7 +102,7 @@ namespace SchoolMealBot.Dialogs
             if (info != null)
             {
                 context.ConversationData.SetValue(ContextConstants.SchoolConfigKey, info);
-                this.schoolInfo = info;
+                schoolInfo = info;
                 await context.PostAsync("설정을 완료했어요!");
             }
             else

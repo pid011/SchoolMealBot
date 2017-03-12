@@ -36,7 +36,7 @@ namespace SchoolMealBot.Dialogs
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            PromptDialog.Choice(context, ResumeAfterChoicedAsync, this.options,
+            PromptDialog.Choice(context, ResumeAfterChoicedAsync, options,
                     "원하시는 옵션을 선택해주세요!", "목록에서 원하는 옵션을 선택해주세요!");
         }
 
@@ -166,7 +166,7 @@ namespace SchoolMealBot.Dialogs
         {
             List<MealMenu> menus = null;
 
-            var meal = new Meal(Util.ConvertRegions(this.schoolInfo.Region), Util.ConvertSchoolTypes(this.schoolInfo.SchoolType), this.schoolInfo.Code);
+            var meal = new Meal(Util.ConvertRegions(schoolInfo.Region), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.Code);
             try
             {
                 menus = meal.GetMealMenu();
