@@ -18,11 +18,11 @@ namespace SchoolMealBot.Core.Image
     {
         private const string ApiKey = "269EFIJL61c2b056e30d6c142b1714e26725e591";
 
-        public static async Task<string> MakeImage(string userId, MealMenu menu)
+        public static byte[] MakeImage(string userId, MealMenu menu)
         {
-            var filename = GetRandomFileName(userId) + ".jpg";
-            var directoryPath = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), "SchoolMealMenu");
-            var filePath = Path.Combine(directoryPath, filename);
+            //var filename = GetRandomFileName(userId) + ".jpg";
+            //var directoryPath = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), "SchoolMealMenu");
+            //var filePath = Path.Combine(directoryPath, filename);
 
 
             List<string> menuStrings = Regex.Split(MenuToString(menu), "\r\n|\r|\n").ToList();
@@ -48,6 +48,7 @@ namespace SchoolMealBot.Core.Image
 
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
+                graphics.FillRectangle(Brushes.DarkGreen, 0, 0, width, height);
                 using (Font writeFont = new Font("Malgun Gothic", 12))
                 {
                     float yPoint = 10f;
@@ -59,23 +60,9 @@ namespace SchoolMealBot.Core.Image
                 }
             }
 
-            await Task.Run(() =>
-            {
-                Directory.CreateDirectory(directoryPath);
-                bitmap.Save(filePath, ImageFormat.Jpeg); //save the image file
-            });
+            var imageArray = (byte[])new ImageConverter().ConvertTo(bitmap, typeof(byte[]));
 
-            UploadResult result = null;
-            try
-            {
-                result = UploadImage(filePath);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return result.Links.ImageLink;
+            return imageArray;
         }
 
         private static string MenuToString(MealMenu menu)
@@ -111,6 +98,7 @@ namespace SchoolMealBot.Core.Image
                         break;
                 }
                 resultMenu.AppendLine("=============");
+                resultMenu.AppendLine();
 
                 if (menu.Breakfast != null)
                 {
