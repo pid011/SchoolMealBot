@@ -192,6 +192,39 @@ namespace SchoolMealBot
             return result;
         }
 
+        public static string GetStringOfDate(DateTime date)
+        {
+            string dateString = $"{date.Month}월 {date.Day}일 ";
+            switch (date.DayOfWeek)
+            {
+                case DayOfWeek.Sunday:
+                    dateString += "일요일";
+                    break;
+                case DayOfWeek.Monday:
+                    dateString += "월요일";
+                    break;
+                case DayOfWeek.Tuesday:
+                    dateString += "화요일";
+                    break;
+                case DayOfWeek.Wednesday:
+                    dateString += "수요일";
+                    break;
+                case DayOfWeek.Thursday:
+                    dateString += "목요일";
+                    break;
+                case DayOfWeek.Friday:
+                    dateString += "금요일";
+                    break;
+                case DayOfWeek.Saturday:
+                    dateString += "토요일";
+                    break;
+                default:
+                    break;
+            }
+
+            return dateString;
+        }
+
         public enum YesNo
         {
             그래,

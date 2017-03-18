@@ -16,8 +16,6 @@ namespace SchoolMealBot.Core.Image
 {
     public class MenuFactory
     {
-        private const string ApiKey = "269EFIJL61c2b056e30d6c142b1714e26725e591";
-
         public static byte[] MakeImage(string userId, MealMenu menu)
         {
             List<string> menuStrings = Regex.Split(MenuToString(menu), "\r\n|\r|\n").ToList();
@@ -65,33 +63,7 @@ namespace SchoolMealBot.Core.Image
             var resultMenu = new StringBuilder();
             if (menu.IsExistMenu)
             {
-                resultMenu.Append($"{menu.Date.Month}월 {menu.Date.Day}일 ");
-                switch (menu.Date.DayOfWeek)
-                {
-                    case DayOfWeek.Sunday:
-                        resultMenu.AppendLine("일요일");
-                        break;
-                    case DayOfWeek.Monday:
-                        resultMenu.AppendLine("월요일");
-                        break;
-                    case DayOfWeek.Tuesday:
-                        resultMenu.AppendLine("화요일");
-                        break;
-                    case DayOfWeek.Wednesday:
-                        resultMenu.AppendLine("수요일");
-                        break;
-                    case DayOfWeek.Thursday:
-                        resultMenu.AppendLine("목요일");
-                        break;
-                    case DayOfWeek.Friday:
-                        resultMenu.AppendLine("금요일");
-                        break;
-                    case DayOfWeek.Saturday:
-                        resultMenu.AppendLine("토요일");
-                        break;
-                    default:
-                        break;
-                }
+                resultMenu.AppendLine(Util.GetStringOfDate(menu.Date.Date));
                 resultMenu.AppendLine("=============");
                 resultMenu.AppendLine();
 

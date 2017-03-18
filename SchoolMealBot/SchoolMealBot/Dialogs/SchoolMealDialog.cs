@@ -177,7 +177,7 @@ namespace SchoolMealBot.Dialogs
             {
                 ContentUrl = image64,
                 ContentType = "image/jpeg",
-                Name = GetDateString(menu.Date.Date)
+                Name = Util.GetStringOfDate(menu.Date.Date)
             };
         }
 
@@ -197,39 +197,6 @@ namespace SchoolMealBot.Dialogs
             }
 
             return menus;
-        }
-
-        private string GetDateString(DateTime date)
-        {
-            string dateString = $"{date.Month}월 {date.Day}일 ";
-            switch (date.DayOfWeek)
-            {
-                case DayOfWeek.Sunday:
-                    dateString += "일요일";
-                    break;
-                case DayOfWeek.Monday:
-                    dateString += "월요일";
-                    break;
-                case DayOfWeek.Tuesday:
-                    dateString += "화요일";
-                    break;
-                case DayOfWeek.Wednesday:
-                    dateString += "수요일";
-                    break;
-                case DayOfWeek.Thursday:
-                    dateString += "목요일";
-                    break;
-                case DayOfWeek.Friday:
-                    dateString += "금요일";
-                    break;
-                case DayOfWeek.Saturday:
-                    dateString += "토요일";
-                    break;
-                default:
-                    break;
-            }
-
-            return dateString;
         }
 
         private List<DateTime> GetDatesOfWeek(DateTime date)
