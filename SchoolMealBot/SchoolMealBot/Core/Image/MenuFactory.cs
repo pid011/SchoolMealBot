@@ -24,7 +24,8 @@ namespace SchoolMealBot.Core.Image
             var directoryPath = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), "SchoolMealMenu");
             var filePath = Path.Combine(directoryPath, filename);
 
-            List<string> menuStrings = Regex.Split(menu.ToString(), "\r\n|\r|\n").ToList();
+
+            List<string> menuStrings = Regex.Split(MenuToString(menu), "\r\n|\r|\n").ToList();
 
             var width = 0;
             var defaultWidth = 500;
@@ -75,6 +76,71 @@ namespace SchoolMealBot.Core.Image
             }
 
             return result.Links.ImageLink;
+        }
+
+        private static string MenuToString(MealMenu menu)
+        {
+            var resultMenu = new StringBuilder();
+            if (menu.IsExistMenu)
+            {
+                resultMenu.Append($"{menu.Date.Month}월 {menu.Date.Day}일 ");
+                switch (menu.Date.DayOfWeek)
+                {
+                    case DayOfWeek.Sunday:
+                        resultMenu.AppendLine("일요일");
+                        break;
+                    case DayOfWeek.Monday:
+                        resultMenu.AppendLine("월요일");
+                        break;
+                    case DayOfWeek.Tuesday:
+                        resultMenu.AppendLine("화요일");
+                        break;
+                    case DayOfWeek.Wednesday:
+                        resultMenu.AppendLine("수요일");
+                        break;
+                    case DayOfWeek.Thursday:
+                        resultMenu.AppendLine("목요일");
+                        break;
+                    case DayOfWeek.Friday:
+                        resultMenu.AppendLine("금요일");
+                        break;
+                    case DayOfWeek.Saturday:
+                        resultMenu.AppendLine("토요일");
+                        break;
+                    default:
+                        break;
+                }
+                resultMenu.AppendLine("=============");
+
+                if (menu.Breakfast != null)
+                {
+                    resultMenu.AppendLine("[아침]");
+                    foreach (var breakfastMenu in menu.Breakfast)
+                    {
+                        resultMenu.AppendLine(breakfastMenu);
+                    }
+                }
+                if (menu.Lunch != null)
+                {
+                    resultMenu.AppendLine();
+                    resultMenu.AppendLine("[점심]");
+                    foreach (var lunchMenu in menu.Lunch)
+                    {
+                        resultMenu.AppendLine(lunchMenu);
+                    }
+                }
+                if (menu.Dinner != null)
+                {
+                    resultMenu.AppendLine();
+                    resultMenu.AppendLine("[저녁]");
+                    foreach (var dinnerMenu in menu.Dinner)
+                    {
+                        resultMenu.AppendLine(dinnerMenu);
+                    }
+                }
+
+            }
+            return resultMenu.ToString();
         }
 
         private static UploadResult UploadImage(string filepath)
