@@ -20,11 +20,6 @@ namespace SchoolMealBot.Core.Image
 
         public static byte[] MakeImage(string userId, MealMenu menu)
         {
-            //var filename = GetRandomFileName(userId) + ".jpg";
-            //var directoryPath = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), "SchoolMealMenu");
-            //var filePath = Path.Combine(directoryPath, filename);
-
-
             List<string> menuStrings = Regex.Split(MenuToString(menu), "\r\n|\r|\n").ToList();
 
             var width = 0;
@@ -129,28 +124,6 @@ namespace SchoolMealBot.Core.Image
 
             }
             return resultMenu.ToString();
-        }
-
-        private static UploadResult UploadImage(string filepath)
-        {
-            ImageShackUploader.ApiKey = ApiKey;
-            return ImageShackUploader.UploadImage(filepath);
-        }
-
-        private static string GetRandomFileName(string userId)
-        {
-            string filename = Regex.Replace(userId, @"[^a-zA-Z0-9가-힣]", "", RegexOptions.Singleline) + "-";
-            Random rnd = new Random();
-            StringBuilder rs = new StringBuilder();
-            var charPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-            int length = 10;
-            while (length-- != 0)
-            {
-                rs.Append(charPool[(int)(rnd.NextDouble() * charPool.Length)]);
-            }
-            filename += rs.ToString();
-
-            return filename;
         }
     }
 }

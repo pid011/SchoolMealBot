@@ -199,69 +199,6 @@ namespace SchoolMealBot.Dialogs
             return menus;
         }
 
-        /// <summary>
-        /// 매개변수로 받는 급식메뉴 리스트를 가공해서 메시지로 보낸 뒤 해당 Dialog를 끝냅니다.
-        /// 매개변수의 리스트가 비어있다면 리스트를 가공하지 않고 급식메뉴가 없다는 메시지를 보냅니다.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="menus">메시지로 보낼 급식메뉴</param>
-        /// <returns></returns>
-        private async Task ShowMessageAsync(IDialogContext context, List<MealMenu> menus)
-        {
-            List<string> menu_list = new List<string>();
-            foreach (var menu in menus)
-            {
-                if (menu.IsExistMenu)
-                {
-                    var resultMenu = new StringBuilder();
-                    resultMenu.AppendLine(GetDateString(menu.Date.Date));
-                    resultMenu.AppendLine("=============");
-                    resultMenu.AppendLine();
-
-                    if (menu.Breakfast != null)
-                    {
-                        resultMenu.AppendLine("[아침]");
-                        foreach (var breakfastMenu in menu.Breakfast)
-                        {
-                            resultMenu.AppendLine(breakfastMenu);
-                        }
-                    }
-                    if (menu.Lunch != null)
-                    {
-                        resultMenu.AppendLine("[점심]");
-                        foreach (var lunchMenu in menu.Lunch)
-                        {
-                            resultMenu.AppendLine(lunchMenu);
-                        }
-                    }
-                    if (menu.Dinner != null)
-                    {
-                        resultMenu.AppendLine("[저녁]");
-                        foreach (var dinnerMenu in menu.Dinner)
-                        {
-                            resultMenu.AppendLine(dinnerMenu);
-                        }
-                    }
-                    menu_list.Add(resultMenu.ToString());
-                }
-                
-            }
-
-            if (menu_list.Count == 0)
-            {
-                await context.PostAsync("선택한 날짜에 해당하는 급식메뉴가 없네요.");
-            }
-            else
-            {
-                foreach (var menu in menu_list)
-                {
-                    await context.PostAsync(menu);
-                }
-            }
-
-            context.Done<object>(null);
-        }
-
         private string GetDateString(DateTime date)
         {
             string dateString = $"{date.Month}월 {date.Day}일 ";
