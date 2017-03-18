@@ -76,9 +76,16 @@ namespace SchoolMealBot.Dialogs
 
                 if (attachments != null)
                 {
-                    replyMsg.Attachments = attachments;
+                    if (attachments.Count == 0)
+                    {
+                        await context.PostAsync("해당 날짜와 일치하는 급식메뉴가 없어요 :O");
+                    }
+                    else
+                    {
+                        replyMsg.Attachments = attachments;
 
-                    await context.PostAsync(replyMsg);
+                        await context.PostAsync(replyMsg);
+                    }
                 }
                 else
                 {
@@ -152,7 +159,10 @@ namespace SchoolMealBot.Dialogs
             var attachments = new List<Attachment>();
             foreach (var menu in menus)
             {
-                attachments.Add(await CreateAttachmentAsync(context, menu));
+                if (menu.IsExistMenu)
+                {
+                    attachments.Add(await CreateAttachmentAsync(context, menu));
+                }
             }
 
             return attachments;
