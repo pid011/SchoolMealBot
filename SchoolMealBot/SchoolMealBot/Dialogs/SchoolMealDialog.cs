@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SchoolMeal;
-using SchoolFinder;
 using System.Text;
 using Microsoft.Bot.Connector;
-using SchoolMealBot.Core.Image;
+using SchoolMealBot.Core.Menu;
+using SchoolMealBot.Core.School;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -185,7 +185,7 @@ namespace SchoolMealBot.Dialogs
         {
             List<MealMenu> menus = null;
 
-            var meal = new Meal(Util.ConvertRegions(schoolInfo.Region), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.Code);
+            var meal = new Meal(Util.ConvertRegions(schoolInfo.SchoolRegion), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.SchoolCode);
             try
             {
                 menus = meal.GetMealMenu();

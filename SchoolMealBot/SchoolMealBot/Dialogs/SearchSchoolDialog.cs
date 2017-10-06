@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SchoolFinder;
+using SchoolMealBot.Core.School;
 using Microsoft.Bot.Connector;
 
 namespace SchoolMealBot.Dialogs
@@ -11,12 +11,14 @@ namespace SchoolMealBot.Dialogs
     [Serializable]
     public class SearchSchoolDialog : IDialog<SchoolInfo>
     {
-        private SchoolInfo userSchoolInfo;
+        private SchoolInfo selectedSchoolInfo;
         private SchoolInfo resultSchoolInfo;
+
+        private SchoolSearcher searcher = new SchoolSearcher();
 
         public SearchSchoolDialog(SchoolInfo info)
         {
-            this.userSchoolInfo = info;
+            selectedSchoolInfo = info;
         }
 
 #pragma warning disable CS1998
@@ -36,10 +38,9 @@ namespace SchoolMealBot.Dialogs
             }
             else
             {
-                var schoolName = msg;
+                selectedSchoolInfo.SchoolName = msg;
 
-                var search = new SchoolSearch();
-                var searchResults = search.SearchSchool(this.userSchoolInfo.SchoolType, this.userSchoolInfo.Region, schoolName);
+                var searchResults = searcher.Search(selectedSchoolInfo.SchoolType, selectedSchoolInfo.SchoolRegion, selectedSchoolInfo.SchoolName);
 
                 if (searchResults.Count == 1)
                 {
@@ -56,8 +57,8 @@ namespace SchoolMealBot.Dialogs
                     {
                         HeroCard heroCard = new HeroCard
                         {
-                            Title = item.Name,
-                            Text = item.Adress
+                            Title = item.SchoolName,
+                            Text = item.SchoolAdress
                         };
                         resultMsg.Attachments.Add(heroCard.ToAttachment());
                     }
@@ -79,11 +80,11 @@ namespace SchoolMealBot.Dialogs
 
         private async Task CheckInfo(IDialogContext context, SchoolInfo selectedInfo)
         {
-            this.resultSchoolInfo = selectedInfo;
+            resultSchoolInfo = selectedInfo;
 
             var checkMsg = context.MakeMessage();
             checkMsg.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            checkMsg.Attachments.Add(new HeroCard(title: selectedInfo.Name, text: selectedInfo.Adress).ToAttachment());
+            checkMsg.Attachments.Add(new HeroCard(title: selectedInfo.SchoolName, text: selectedInfo.SchoolAdress).ToAttachment());
             await context.PostAsync(checkMsg);
 
             var yesno = ((IEnumerable<Util.YesNo>)Enum.GetValues(typeof(Util.YesNo))).Select(x => x);
@@ -96,11 +97,11 @@ namespace SchoolMealBot.Dialogs
 
             if (choiced == Util.YesNo.그래)
             {
-                context.Done(this.resultSchoolInfo);
+                context.Done(resultSchoolInfo);
             }
             else
             {
-                this.resultSchoolInfo = null;
+                resultSchoolInfo = null;
                 PromptDialog.Text(context, OnGetSchoolNameAsync, "현재 다니는 학교의 이름을 다시 알려주세요! ([ exit ] => 설정 종료)");
             }
         }

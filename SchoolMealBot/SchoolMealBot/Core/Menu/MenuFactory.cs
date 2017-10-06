@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace SchoolMealBot.Core.Image
+namespace SchoolMealBot.Core.Menu
 {
     public class MenuFactory
     {

@@ -23,6 +23,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -134,7 +135,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="ContextConstants.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
-    <Compile Include="Core\Image\MenuFactory.cs" />
+    <Compile Include="Core\Menu\MenuFactory.cs" />
+    <Compile Include="Core\School\SchoolInfo.cs" />
+    <Compile Include="Core\School\SchoolSearcher.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\SchoolInfoConfigDialog.cs" />
     <Compile Include="Dialogs\SchoolMealDialog.cs" />

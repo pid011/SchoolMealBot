@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SchoolFinder;
+using SchoolMealBot.Core.School;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -13,12 +13,12 @@ namespace SchoolMealBot.Dialogs
         /// <summary>
         /// 클래스 리턴값
         /// </summary>
-        private SchoolInfo userSchoolInfo;
+        private SchoolInfo selectedSchoolInfo;
 
 #pragma warning disable CS1998
         public async Task StartAsync(IDialogContext context)
         {
-            this.userSchoolInfo = new SchoolInfo();
+            selectedSchoolInfo = new SchoolInfo();
             var regions = ((IEnumerable<SchoolConfigQuery.SchoolRegions>)Enum.GetValues(typeof(SchoolConfigQuery.SchoolRegions))).Select(x => x);
 
             PromptDialog.Choice(context, OnSchoolRegionSelectedAsync, regions, 
@@ -28,7 +28,7 @@ namespace SchoolMealBot.Dialogs
         private async Task OnSchoolRegionSelectedAsync(IDialogContext context, IAwaitable<SchoolConfigQuery.SchoolRegions> result)
         {
             var choiced = await result;
-            this.userSchoolInfo.Region = Util.ConvertRegions(choiced);
+            selectedSchoolInfo.SchoolRegion = Util.ConvertRegions(choiced);
 
             var types = ((IEnumerable<SchoolConfigQuery.SchoolTypes>)Enum.GetValues(typeof(SchoolConfigQuery.SchoolTypes))).Select(x => x);
 
@@ -39,9 +39,9 @@ namespace SchoolMealBot.Dialogs
         private async Task OnSchoolTypeSelectedAsync(IDialogContext context, IAwaitable<SchoolConfigQuery.SchoolTypes> result)
         {
             var choiced = await result;
-            this.userSchoolInfo.SchoolType = Util.ConvertSchoolTypes(choiced);
+            selectedSchoolInfo.SchoolType = Util.ConvertSchoolTypes(choiced);
 
-            context.Done(this.userSchoolInfo);
+            context.Done(selectedSchoolInfo);
         }
     }
 }

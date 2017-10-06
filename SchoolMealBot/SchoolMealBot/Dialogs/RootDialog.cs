@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
-using SchoolFinder;
+using SchoolMealBot.Core.School;
 
 namespace SchoolMealBot.Dialogs
 {
@@ -23,6 +23,7 @@ namespace SchoolMealBot.Dialogs
             SettingsOption,
             RemoveUserDataOption
         };
+
         private bool welcomed;
 
 #pragma warning disable CS1998
