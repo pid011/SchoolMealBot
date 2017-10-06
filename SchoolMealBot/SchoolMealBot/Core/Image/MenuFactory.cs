@@ -34,13 +34,13 @@ namespace SchoolMealBot.Core.Image
 
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
-                graphics.FillRectangle(Brushes.DarkGreen, 0, 0, width, height);
+                graphics.FillRectangle(Brushes.GhostWhite, 0, 0, width, height);
                 using (Font writeFont = new Font("Malgun Gothic", 12))
                 {
                     float yPoint = 10f;
                     foreach (var str in menuStrings)
                     {
-                        graphics.DrawString(str, writeFont, Brushes.White, new PointF(15f, yPoint));
+                        graphics.DrawString(str, writeFont, Brushes.Black, new PointF(15f, yPoint));
                         yPoint += 20f;
                     }
                 }
