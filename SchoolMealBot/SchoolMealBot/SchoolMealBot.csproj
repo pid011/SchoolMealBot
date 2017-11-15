@@ -136,6 +136,7 @@
     <Compile Include="ContextConstants.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Core\Menu\MenuFactory.cs" />
+    <Compile Include="Core\Menu\MenuGenerator.cs" />
     <Compile Include="Core\School\SchoolInfo.cs" />
     <Compile Include="Core\School\SchoolSearcher.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
