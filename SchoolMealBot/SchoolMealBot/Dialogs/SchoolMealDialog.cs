@@ -7,14 +7,13 @@ using System.Text;
 using Microsoft.Bot.Connector;
 using SchoolMealBot.Core.Menu;
 using SchoolMealBot.Core.School;
-using System.Linq;
 
 namespace SchoolMealBot.Dialogs
 {
     [Serializable]
     public class SchoolMealDialog : IDialog<object>
     {
-        private MenuGenerator generator = null;
+        private SchoolInfo schoolInfo;
 
         private const string TodaysSchoolMealOption = "오늘급식";
         private const string TomorrowsSchoolMealOption = "내일급식";
@@ -31,11 +30,7 @@ namespace SchoolMealBot.Dialogs
 
         public SchoolMealDialog(SchoolInfo schoolInfo)
         {
-            if (schoolInfo != null)
-            {
-                generator = new MenuGenerator(schoolInfo);
-            }
-            
+            this.schoolInfo = schoolInfo;
         }
 
 #pragma warning disable CS1998
@@ -48,28 +43,31 @@ namespace SchoolMealBot.Dialogs
         private async Task ResumeAfterChoicedAsync(IDialogContext context, IAwaitable<string> result)
         {
             var resultType = await result;
+
+            var mealMenu = await GetSchoolMealListAsync(context);
+
             var replyMsg = context.MakeMessage();
 
             List<Attachment> attachments = null;
 
-            if (generator != null)
+            if (mealMenu != null && schoolInfo != null)
             {
                 switch (resultType)
                 {
                     case TodaysSchoolMealOption:
-                        attachments = await GetTodaysSchoolMealMenuAsync(context);
+                        attachments = GetTodaysSchoolMealMenuAsync(context, mealMenu);
                         break;
 
                     case TomorrowsSchoolMealOption:
-                        attachments = await GetTomorrowsSchoolMealMenuAsync(context);
+                        attachments = GetTomorrowsSchoolMealMenuAsync(context, mealMenu);
                         break;
 
                     case SchoolMealThisWeekOption:
-                        attachments = await GetSchoolMealThisWeekMenuAsync(context);
+                        attachments = GetSchoolMealThisWeekMenuAsync(context, mealMenu);
                         break;
 
                     case SchoolMealNextWeekOption:
-                        attachments = await GetSchoolMealNextWeekMenuAsync(context);
+                        attachments = GetSchoolMealNextWeekMenuAsync(context, mealMenu);
                         break;
 
                     default:
@@ -98,37 +96,60 @@ namespace SchoolMealBot.Dialogs
             }
         }
 
-        private async Task<List<Attachment>> GetTodaysSchoolMealMenuAsync(IDialogContext context)
+        private List<Attachment> GetTodaysSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todaysDate = DateTime.Now;
-
-            var todayMenu = (await GetSchoolMealListAsync(context, new List<DateTime>() { todaysDate })).First();
+            MealMenu todayMenu = null;
+            if (menus.Exists(x => x.Date.Date == todaysDate.Date))
+            {
+                todayMenu = menus.Find(x => x.Date.Date == todaysDate.Date);
+            }
 
             return todayMenu != null ? CreateAttachmentsAsync(context, new List<MealMenu> { todayMenu }) : null;
         }
 
-        private async Task<List<Attachment>> GetTomorrowsSchoolMealMenuAsync(IDialogContext context)
+        private List<Attachment> GetTomorrowsSchoolMealMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var tomorrowDate = DateTime.Now.AddDays(1);
-            var tomorrowMenu = (await GetSchoolMealListAsync(context, new List<DateTime>() { tomorrowDate })).First();
+            MealMenu tomorrowMenu = null;
+            if (menus.Exists(x => x.Date.Date == tomorrowDate.Date))
+            {
+                tomorrowMenu = menus.Find(x => x.Date.Date == tomorrowDate.Date);
+            }
 
             return tomorrowMenu != null ? CreateAttachmentsAsync(context, new List<MealMenu> { tomorrowMenu }) : null;
         }
 
-        private async Task<List<Attachment>> GetSchoolMealThisWeekMenuAsync(IDialogContext context)
+        private List<Attachment> GetSchoolMealThisWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var todayDate = DateTime.Now;
             var datesOfWeek = GetDatesOfWeek(todayDate);
-            var thisWeekMenu = await GetSchoolMealListAsync(context, datesOfWeek);
+            var thisWeekMenu = new List<MealMenu>();
+
+            foreach (var date in datesOfWeek)
+            {
+                if (menus.Exists(x => x.Date.Date.Date == date.Date.Date))
+                {
+                    thisWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
+                }
+            }
 
             return thisWeekMenu != null ? CreateAttachmentsAsync(context, thisWeekMenu) : null;
         }
 
-        private async Task<List<Attachment>> GetSchoolMealNextWeekMenuAsync(IDialogContext context)
+        private List<Attachment> GetSchoolMealNextWeekMenuAsync(IDialogContext context, List<MealMenu> menus)
         {
             var NextWeekDate = DateTime.Now.AddDays(7);
             var datesOfWeek = GetDatesOfWeek(NextWeekDate);
-            var nextWeekMenu = await GetSchoolMealListAsync(context, datesOfWeek);
+            var nextWeekMenu = new List<MealMenu>();
+
+            foreach (var date in datesOfWeek)
+            {
+                if (menus.Exists(x => x.Date.Date == date.Date))
+                {
+                    nextWeekMenu.Add(menus.Find(x => x.Date.Date == date.Date));
+                }
+            }
 
             return nextWeekMenu != null ? CreateAttachmentsAsync(context, nextWeekMenu) : null;
         }
@@ -159,18 +180,19 @@ namespace SchoolMealBot.Dialogs
                 Name = Util.GetStringOfDate(menu.Date.Date)
             };
         }
-        
 
-        private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context, List<DateTime> dates)
+        private async Task<List<MealMenu>> GetSchoolMealListAsync(IDialogContext context)
         {
             List<MealMenu> menus = null;
+
+            var meal = new Meal(Util.ConvertRegions(schoolInfo.SchoolRegion), Util.ConvertSchoolTypes(schoolInfo.SchoolType), schoolInfo.SchoolCode);
             try
             {
-                menus = generator.GetSchoolMealMenu(dates);
+                menus = meal.GetMealMenu();
             }
             catch (SchoolMeal.Exception.FaildToParseException ex)
             {
-                await context.PostAsync("급식정보를 가져오는 도중에 문제가 발생 했어요 :( \n" + ex.Message);
+                await context.PostAsync("급식정보를 가져오는 도중에 문제가 발생 했어요 :( " + ex.Message);
                 context.Done<object>(null);
             }
 
